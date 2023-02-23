@@ -166,11 +166,11 @@
       </el-table-column>
 
       <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
+        <template slot-scope="{row, $index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row, $index)">
             删除
           </el-button>
         </template>
@@ -581,8 +581,8 @@ export default {
       searchProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
-        this.listLoading = false
       })
+      this.listLoading = false
 
       // 设置经销商
       this.temp.belong_to = sessionStorage.getItem('selectDealer')
@@ -607,7 +607,7 @@ export default {
               type: 'success',
               duration: 2000
             })
-            
+
             // 刷新表格数据
             this.getDealerSelection()
           })
