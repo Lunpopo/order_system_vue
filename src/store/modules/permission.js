@@ -1,51 +1,15 @@
 /*
- * @Author: xie.yx yxxie@gk-estor.com
+ * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-23 17:16:51
+ * @LastEditors: lunpopo lunpopo.personal@gmail.com
+ * @LastEditTime: 2023-02-25 22:10:09
  * @FilePath: /order_system_vue/src/store/modules/permission.js
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: 动态路由控制
  */
-import { asyncRoutes, constantRoutes } from '@/router'
-
-// const asyncRoutes = [
-//   // 异步路由
-//   {
-//     path: '/permission',
-//     component: 'Layout',
-//     redirect: '/permission/page',
-//     alwaysShow: true, // will always show in the root menu
-//     name: 'Permission',
-//     meta: {
-//       title: '权限控制',
-//       icon: 'lock',
-//       roles: ['admin', 'editor'] // you can set roles in root nav
-//     },
-//     children: [
-//       {
-//         path: 'menu',
-//         component: '/views/permission/menu',
-//         name: 'MenuPermission',
-//         meta: {
-//           title: '菜单权限',
-//           roles: ['admin']
-//         }
-//       },
-//       {
-//         path: 'role',
-//         component: '/views/permission/role',
-//         name: 'RolePermission',
-//         meta: {
-//           title: '角色权限',
-//           roles: ['admin']
-//         }
-//       }
-//     ]
-//   },
-
-//   // 就是没匹配上的都进入 404 路由，并且404页面只能放到最下面
-//   { path: '*', redirect: '/404', hidden: true }
-// ]
+// import { asyncRoutes, constantRoutes } from '@/router'
+import { constantRoutes } from '@/router'
+import { getViewRoutes } from '@/api/user'
+import Layout from '@/layout'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -61,7 +25,45 @@ function hasPermission(roles, route) {
 }
 
 /**
- * Filter asynchronous routing tables by recursion
+ * 根据后台返回的路径，生成页面的组件模版
+ * @param component 组件名
+ * @returns 导入的包的对象
+ */
+function loadView(component) {
+  return (resolve) => require([`@/${component}.vue`], resolve)
+}
+
+/**
+ * 把后台返回菜单组装成routes要求的格式
+ * @param routes routes
+ */
+function getAsyncRoutes(routes) {
+  const res = []
+  const keys = ['path', 'name', 'children', 'redirect', 'alwaysShow', 'meta', 'hidden']
+  routes.forEach(item => {
+    const newItem = {}
+    if (item.component) {
+      if (item.component === 'layout/Layout' || item.component === 'Layout') {
+        newItem.component = Layout
+      } else {
+        newItem.component = loadView(item.component)
+      }
+    }
+    for (const key in item) {
+      if (keys.includes(key)) {
+        newItem[key] = item[key]
+      }
+    }
+    if (newItem.children && newItem.children.length) {
+      newItem.children = getAsyncRoutes(item.children)
+    }
+    res.push(newItem)
+  })
+  return res
+}
+
+/**
+ * 通过递归过滤异步路由表
  * @param routes asyncRoutes
  * @param roles
  */
@@ -94,10 +96,18 @@ const mutations = {
 }
 
 const actions = {
+  /**
+   * 根据角色生成对应角色可访问的路由对象数组
+   * @param {commit} 不知道
+   * @param {roles} roles 角色信息
+   * @returns 
+   */
   generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
       let accessedRoutes
       if (roles.includes('admin')) {
+        const routes = await getViewRoutes() // 获取到后台路由
+        const asyncRoutes = getAsyncRoutes(routes.data) // 对路由格式进行处理
         accessedRoutes = asyncRoutes || []
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)

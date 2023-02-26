@@ -1,8 +1,8 @@
-<!--
- * @Author: xie.yx yxxie@gk-estor.com
+<!-- <!--
+ * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-22 16:14:59
+ * @LastEditors: lunpopo lunpopo.personal@gmail.com
+ * @LastEditTime: 2023-02-25 20:45:06
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -11,22 +11,22 @@
     <el-button type="primary" @click="handleAddRole">新增角色</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
-      <el-table-column align="center" label="Role Key" width="220">
+      <el-table-column align="center" label="角色权限key" width="220">
         <template slot-scope="scope">
-          {{ scope.row.key }}
+          {{ scope.row.group_name }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Role Name" width="220">
+      <el-table-column align="center" label="角色名" width="220">
         <template slot-scope="scope">
-          {{ scope.row.name }}
+          {{ scope.row.group_label }}
         </template>
       </el-table-column>
-      <el-table-column align="header-center" label="Description">
+      <el-table-column align="header-center" label="描述信息">
         <template slot-scope="scope">
           {{ scope.row.description }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Operations">
+      <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope)">编辑权限</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
@@ -37,10 +37,10 @@
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新增角色'">
       <el-form :model="role" label-width="80px" label-position="left">
         <el-form-item label="角色键值名">
-          <el-input v-model="role.key" placeholder="请输入角色键值名，例如：editor" />
+          <el-input v-model="role.group_name" placeholder="请输入角色键值名，例如：editor" />
         </el-form-item>
         <el-form-item label="角色名">
-          <el-input v-model="role.name" placeholder="请输入角色键值名，例如：普通用户组" />
+          <el-input v-model="role.group_label" placeholder="请输入角色键值名，例如：普通用户组" />
         </el-form-item>
         <el-form-item label="描述信息">
           <el-input
@@ -50,14 +50,24 @@
             placeholder="请输入角色描述信息"
           />
         </el-form-item>
-        <el-form-item label="菜单">
+        <!-- <el-form-item label="菜单">
           <el-tree
             ref="tree"
-            :check-strictly="checkStrictly"
             :data="routesData"
+            :check-strictly="checkStrictly"
             :props="defaultProps"
             show-checkbox
             node-key="path"
+            class="permission-tree"
+          />
+        </el-form-item> -->
+        <el-form-item label="菜单">
+          <el-tree
+            ref="tree"
+            :data="routesData"
+            show-checkbox
+            node-key="path"
+            :props="defaultProps"
             class="permission-tree"
           />
         </el-form-item>
@@ -73,24 +83,17 @@
 <script>
 import path from 'path'
 import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
-
-// const defaultRole = {
-//   key: '',
-//   name: '',
-//   description: '',
-//   routes: []
-// }
+import { getRoutes, getRoutesByRole, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
 
 export default {
   data() {
     return {
-      // role: Object.assign({}, defaultRole),
       role: {},
       routes: [],
       rolesList: [],
       dialogVisible: false,
       dialogType: 'new',
+      // 多选框是否与父类进行单独隔开
       checkStrictly: false,
       defaultProps: {
         children: 'children',
@@ -109,7 +112,7 @@ export default {
     this.getRoles()
   },
   methods: {
-    // 获取所有的路由
+    // 获取所有的路由（菜单/api 列表）
     async getRoutes() {
       const res = await getRoutes()
       this.serviceRoutes = res.data
@@ -118,7 +121,7 @@ export default {
 
     async getRoles() {
       const res = await getRoles()
-      this.rolesList = res.data
+      this.rolesList = res.data.data
     },
 
     // 重塑路由结构，使其看起来与侧边栏相同
@@ -171,22 +174,7 @@ export default {
       return false
     },
 
-    generateArr(routes) {
-      let data = []
-      routes.forEach(route => {
-        data.push(route)
-        if (route.children) {
-          const temp = this.generateArr(route.children)
-          if (temp.length > 0) {
-            data = [...data, ...temp]
-          }
-        }
-      })
-      return data
-    },
-
     handleAddRole() {
-      // this.role = Object.assign({}, defaultRole)
       this.role = {}
       if (this.$refs.tree) {
         this.$refs.tree.setCheckedNodes([])
@@ -203,30 +191,57 @@ export default {
 
       // 深度拷贝这一行的数据对象
       this.role = deepClone(scope.row)
-
+      
+      // this.$nextTick(()=>{}) 将回调函数中的操作放到下一次DOM更新之后执行
       this.$nextTick(() => {
-        const routes = this.generateRoutes(this.role.routes)
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes))
-        // 设置节点的已检查状态不会影响其父节点和子节点
-        this.checkStrictly = false
+        // 获取只存在该行角色的路由
+        getRoutesByRole({ role: this.role.group_name }).then((response) => {
+          const routes = this.generateArr(this.generateRoutes(response.data))
+          this.$refs.tree.setCheckedNodes(routes)
+          // 设置节点的已检查状态不会影响其父节点和子节点
+          // this.checkStrictly = false
+        })
       })
     },
 
-    handleDelete({ $index, row }) {
-      this.$confirm('Confirm to remove the role?', 'Warning', {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      })
-        .then(async() => {
-          await deleteRole(row.key)
-          this.rolesList.splice($index, 1)
-          this.$message({
-            type: 'success',
-            message: 'Delete succed!'
+    // 生成checkbox选中的方法
+    generateArr(routes) {
+      let data = []
+      routes.forEach(route => {
+        if (route.children) {
+          route.children.forEach(children_route => {
+            data.push(children_route)
           })
+        }
+        // 如果是与父类进行单独隔开，就要用这部分的代码
+        // data.push(route)
+        // if (route.children) {
+        //   const temp = this.generateArr(route.children)
+        //   if (temp.length > 0) {
+        //     data = [...data, ...temp]
+        //   }
+        // }
+      })
+      return data
+    },
+    
+    // 删除角色
+    handleDelete({ $index, row }) {
+      this.$confirm('确认删除此角色吗？', '删除角色', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        await deleteRole({ 'role_id': row.business_id, 'group_name': row.group_name })
+        this.rolesList.splice($index, 1)
+
+        this.$notify({
+          title: '删除角色' + row.group_name + '成功！',
+          message: '删除成功！',
+          type: 'success',
+          duration: 2000
         })
-        .catch(err => { console.error(err) })
+      }).catch(err => { console.error(err) })
     },
 
     generateTree(routes, basePath = '/', checkedKeys) {
@@ -246,6 +261,8 @@ export default {
       }
       return res
     },
+
+    // 弹出框的确认按钮（新增或者更新）
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
 
@@ -262,6 +279,9 @@ export default {
         }
       } else {
         const { data } = await addRole(this.role)
+        console.log('data')
+        console.log(data)
+        console.log(data.data)
         this.role.key = data.key
         this.rolesList.push(this.role)
       }
@@ -292,4 +312,4 @@ export default {
     margin-bottom: 30px;
   }
 }
-</style>
+</style> -->

@@ -1,10 +1,10 @@
 /*
- * @Author: xie.yx yxxie@gk-estor.com
+ * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-20 15:42:57
+ * @LastEditors: lunpopo lunpopo.personal@gmail.com
+ * @LastEditTime: 2023-02-25 20:45:38
  * @FilePath: /vue-element-admin/src/api/user.js
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: 用户信息api
  */
 import request from '@/utils/request'
 
@@ -18,10 +18,16 @@ export function login(data) {
 }
 
 // 获取用户token
-export function getInfo(token) {
+export function getInfo() {
   return request({
     url: '/user/info',
-    method: 'get',
-    params: { token }
+    method: 'get'
+  })
+}
+
+export function getViewRoutes() {
+  return request({
+    url: '/user/get_view_routes',
+    method: 'get'
   })
 }

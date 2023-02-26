@@ -1,10 +1,10 @@
 /*
- * @Author: xie.yx yxxie@gk-estor.com
- * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-23 17:20:56
- * @FilePath: /vue-element-admin/src/permission.js
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Author: lunpopo lunpopo.personal@gmail.com
+ * @Date: 2023-02-25 16:23:05
+ * @LastEditors: lunpopo lunpopo.personal@gmail.com
+ * @LastEditTime: 2023-02-25 21:55:29
+ * @FilePath: /order_system_vue/src/permission.js
+ * @Description: 
  */
 import router from './router'
 import store from './store'
@@ -20,6 +20,7 @@ const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
   // 用户登录成功之后，会在全局钩子router.beforeEach中拦截路由，判断是否已获得token，在获得token之后我们就要去获取用户的基本信息了
+  // 页面加载进度条，在左上角
   // start progress bar
   NProgress.start()
 
@@ -33,12 +34,10 @@ router.beforeEach(async(to, from, next) => {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
-      NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
+      NProgress.done()
     } else {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
-      console.log('输出 has role')
-      console.log(hasRoles)
       if (hasRoles) {
         next()
       } else {
@@ -47,19 +46,19 @@ router.beforeEach(async(to, from, next) => {
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
 
-          // generate accessible routes map based on roles
+          // 基于角色生成可访问路线图
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
-          // dynamically add accessible routes
+          // 动态添加可访问路由
           router.addRoutes(accessRoutes)
 
-          // hack method to ensure that addRoutes is complete
-          // set the replace: true, so the navigation will not leave a history record
+          // hack方法确保addRoutes完成
+          // 将replace:true设置为true，这样导航将不会留下历史记录
           next({ ...to, replace: true })
         } catch (error) {
-          // remove token and go to login page to re-login
+          // 获取用户信息失败！
+          // 删除 token 并转到登录页面重新登录
           await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
+          Message.error('登录信息过期，请重新登录！')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
         }

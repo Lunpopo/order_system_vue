@@ -1,8 +1,8 @@
 <!--
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-23 16:50:43
+ * @LastEditors: lunpopo lunpopo.personal@gmail.com
+ * @LastEditTime: 2023-02-26 23:23:27
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -16,9 +16,22 @@
           {{ row.title }}
         </template>
       </el-table-column>
+
+      <el-table-column align="center" label="在veu中的name">
+        <template slot-scope="{row}">
+          {{ row.vue_name }}
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" label="icon">
         <template slot-scope="{row}">
           {{ row.icon }}
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="redirect">
+        <template slot-scope="{row}">
+          {{ row.redirect }}
         </template>
       </el-table-column>
 
@@ -43,7 +56,7 @@
 
       <el-table-column align="center" label="api权限">
         <template slot-scope="{row}">
-          {{ row.permission_label }}
+          {{ row.permission }}
         </template>
       </el-table-column>
 
@@ -83,8 +96,16 @@
           <el-input v-model="temp.title" placeholder="请输入api名字，例如：货单表格" />
         </el-form-item>
 
+        <el-form-item label="在vue中的name" prop="vue_name">
+          <el-input v-model="temp.vue_name" placeholder="请输入vue中展示的名字，例如：Permission" />
+        </el-form-item>
+
         <el-form-item label="icon" prop="icon">
           <el-input v-model="temp.icon" placeholder="请输入icon，例如：table" />
+        </el-form-item>
+
+        <el-form-item label="redirect" prop="redirect">
+          <el-input v-model="temp.redirect" placeholder="请输入redirect，例如：/permission/page" />
         </el-form-item>
 
         <el-form-item label="菜单等级" prop="menu_type">
@@ -122,7 +143,6 @@
         </el-form-item>
 
         <el-form-item label="api权限" prop="permission">
-          <!-- <el-input v-model="temp.permission" placeholder="请输入api权限，例如：editor" /> -->
           <el-select v-model="temp.permission" multiple filterable allow-create default-first-option placeholder="请选择此api的权限，例如：editor">
             <el-option
               v-for="item in api_permission_options"
@@ -212,7 +232,7 @@ export default {
         // 默认选择不隐藏
         'hidden': 0,
         // 默认api权限为editor
-        'permission': [0]
+        'permission': ['editor']
       },
       // 获取所有的api，放入apiList里面
       apiList: [],
@@ -299,7 +319,7 @@ export default {
         timestamp: new Date(),
         'menu_type': 0,
         'hidden': 0,
-        'permission': [0]
+        'permission': ['editor']
       }
     },
 
