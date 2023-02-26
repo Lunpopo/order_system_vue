@@ -4,7 +4,7 @@
  * @LastEditors: lunpopo lunpopo.personal@gmail.com
  * @LastEditTime: 2023-02-25 21:55:29
  * @FilePath: /order_system_vue/src/permission.js
- * @Description: 
+ * @Description:
  */
 import router from './router'
 import store from './store'

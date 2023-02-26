@@ -191,7 +191,7 @@ export default {
 
       // 深度拷贝这一行的数据对象
       this.role = deepClone(scope.row)
-      
+
       // this.$nextTick(()=>{}) 将回调函数中的操作放到下一次DOM更新之后执行
       this.$nextTick(() => {
         // 获取只存在该行角色的路由
@@ -206,7 +206,7 @@ export default {
 
     // 生成checkbox选中的方法
     generateArr(routes) {
-      let data = []
+      const data = []
       routes.forEach(route => {
         if (route.children) {
           route.children.forEach(children_route => {
@@ -224,7 +224,7 @@ export default {
       })
       return data
     },
-    
+
     // 删除角色
     handleDelete({ $index, row }) {
       this.$confirm('确认删除此角色吗？', '删除角色', {

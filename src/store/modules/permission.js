@@ -100,7 +100,7 @@ const actions = {
    * 根据角色生成对应角色可访问的路由对象数组
    * @param {commit} 不知道
    * @param {roles} roles 角色信息
-   * @returns 
+   * @returns
    */
   generateRoutes({ commit }, roles) {
     return new Promise(async resolve => {
