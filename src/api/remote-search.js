@@ -8,9 +8,10 @@ export function searchUser(name) {
   })
 }
 
+// 获取交易信息api
 export function transactionList(query) {
   return request({
-    url: '/vue-element-admin/transaction/list',
+    url: '/order/get_transaction_list',
     method: 'get',
     params: query
   })

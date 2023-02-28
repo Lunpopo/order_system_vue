@@ -11,6 +11,7 @@ export function isExternal(path) {
 }
 
 /**
+ * 登录用户名验证
  * @param {string} str
  * @returns {Boolean}
  */

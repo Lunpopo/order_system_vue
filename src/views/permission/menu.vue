@@ -1,8 +1,8 @@
 <!--
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: lunpopo lunpopo.personal@gmail.com
- * @LastEditTime: 2023-02-26 23:23:27
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-02-27 15:38:03
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -11,13 +11,13 @@
     <el-button type="primary" @click="handleAddRole">新增菜单</el-button>
 
     <el-table v-loading="listLoading" :data="apiList" style="width: 100%;margin-top:30px;" border>
-      <el-table-column align="center" label="api名字">
+      <el-table-column align="center" label="API名字">
         <template slot-scope="{row}">
           {{ row.title }}
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="在veu中的name">
+      <el-table-column align="center" label="在Vue中的名字">
         <template slot-scope="{row}">
           {{ row.vue_name }}
         </template>
@@ -54,7 +54,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="api权限">
+      <el-table-column align="center" label="API权限">
         <template slot-scope="{row}">
           {{ row.permission }}
         </template>
@@ -72,7 +72,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="api描述信息">
+      <el-table-column align="center" label="API描述信息">
         <template slot-scope="{row}">
           {{ row.description }}
         </template>
@@ -93,23 +93,23 @@
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新增角色'">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-width="155px" label-position="left">
         <el-form-item label="api名字" prop="title">
-          <el-input v-model="temp.title" placeholder="请输入api名字，例如：货单表格" />
+          <el-input v-model.trim="temp.title" placeholder="请输入API名字，例如：货单表格" />
         </el-form-item>
 
         <el-form-item label="在vue中的name" prop="vue_name">
-          <el-input v-model="temp.vue_name" placeholder="请输入vue中展示的名字，例如：Permission" />
+          <el-input v-model.trim="temp.vue_name" placeholder="请输入Vue中展示的名字，例如：Permission" />
         </el-form-item>
 
         <el-form-item label="icon" prop="icon">
-          <el-input v-model="temp.icon" placeholder="请输入icon，例如：table" />
+          <el-input v-model.trim="temp.icon" placeholder="请输入icon，例如：table" />
         </el-form-item>
 
         <el-form-item label="redirect" prop="redirect">
-          <el-input v-model="temp.redirect" placeholder="请输入redirect，例如：/permission/page" />
+          <el-input v-model.trim="temp.redirect" placeholder="请输入redirect，例如：/permission/page" />
         </el-form-item>
 
         <el-form-item label="菜单等级" prop="menu_type">
-          <el-select v-model="temp.menu_type" placeholder="请选择菜单等级">
+          <el-select v-model.trim="temp.menu_type" placeholder="请选择菜单等级">
             <el-option
               v-for="item in menu_type_options"
               :key="item.value"
@@ -121,7 +121,7 @@
 
         <!-- 选了非一级菜单之后才会出现这个父级菜单 -->
         <el-form-item v-if="temp.menu_type == 1" label="父类菜单" prop="api_parent_id">
-          <el-select v-model="temp.api_parent_id" clearable placeholder="请选择父类菜单">
+          <el-select v-model.trim="temp.api_parent_id" clearable placeholder="请选择父类菜单">
             <el-option
               v-for="item in parent_menu_type_options"
               :key="item.id"
@@ -132,7 +132,7 @@
         </el-form-item>
 
         <el-form-item label="是否隐藏该菜单" prop="hidden">
-          <el-select v-model="temp.hidden" placeholder="请选择是否隐藏该菜单">
+          <el-select v-model.trim="temp.hidden" placeholder="请选择是否隐藏该菜单">
             <el-option
               v-for="item in hidden_options"
               :key="item.value"
@@ -142,8 +142,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="api权限" prop="permission">
-          <el-select v-model="temp.permission" multiple filterable allow-create default-first-option placeholder="请选择此api的权限，例如：editor">
+        <el-form-item label="API权限" prop="permission">
+          <el-select v-model.trim="temp.permission" multiple filterable allow-create default-first-option placeholder="请选择此API的权限，例如：editor">
             <el-option
               v-for="item in api_permission_options"
               :key="item.id"
@@ -154,13 +154,13 @@
         </el-form-item>
 
         <el-form-item label="路由路径" prop="router_path">
-          <el-input v-model="temp.router_path" placeholder="请输入路由路径，例如：/user/get_group_data" />
+          <el-input v-model.trim="temp.router_path" placeholder="请输入路由路径，例如：/user/get_group_data" />
         </el-form-item>
         <el-form-item label="容器路径" prop="component_path">
-          <el-input v-model="temp.component_path" placeholder="请输入容器路径，例如：views/product/myself-price-list" />
+          <el-input v-model.trim="temp.component_path" placeholder="请输入容器路径，例如：views/product/myself-price-list" />
         </el-form-item>
         <el-form-item label="api的描述信息" prop="description">
-          <el-input v-model.trim="temp.description" :autosize="{ minRows: 3, maxRows: 4}" type="textarea" placeholder="输入此api的描述信息" />
+          <el-input v-model.trim="temp.description" :autosize="{ minRows: 3, maxRows: 4}" type="textarea" placeholder="输入此API的描述信息" />
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -245,11 +245,11 @@ export default {
       },
       // 表单验证规则
       rules: {
-        title: [{ required: true, message: '请输入api的名字', trigger: 'change' }],
+        title: [{ required: true, message: '请输入API的名字', trigger: 'change' }],
         api_parent_id: [{ required: true, message: '请选择父类菜单', trigger: 'blur' }],
         menu_type: [{ required: true, msg: '请选择菜单等级', validator: limitNumber, trigger: 'blur' }],
-        hidden: [{ required: true, message: '请选择是否隐藏此菜单（api）', trigger: 'blur' }],
-        permission: [{ required: true, message: '请输入api权限', trigger: 'blur' }],
+        hidden: [{ required: true, message: '请选择是否隐藏此菜单（API）', trigger: 'blur' }],
+        permission: [{ required: true, message: '请输入API权限', trigger: 'blur' }],
         router_path: [{ required: true, message: '请输入路由路径', trigger: 'blur' }],
         component_path: [{ required: true, message: '请输入容器路径', trigger: 'blur' }]
       }

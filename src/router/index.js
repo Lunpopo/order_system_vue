@@ -158,7 +158,7 @@ export const constantRoutes = [
 //   {
 //     path: '/product',
 //     component: Layout,
-//     redirect: '/table/myself-price-list',
+//     redirect: '/product/myself-price-list',
 //     name: 'Product',
 //     meta: {
 //       title: '货单表格',
@@ -221,7 +221,7 @@ export const constantRoutes = [
 //         path: 'outbound-order',
 //         component: () => import('@/views/order/outbound-order'),
 //         name: 'OutboundOrder',
-//         meta: { title: '出货单', icon: 'money', roles: ['admin'] }
+//         meta: { title: '出库单', icon: 'money', roles: ['admin'] }
 //       }
 //     ]
 //   },

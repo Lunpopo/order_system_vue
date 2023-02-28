@@ -1,13 +1,13 @@
 /*
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: lunpopo lunpopo.personal@gmail.com
- * @LastEditTime: 2023-02-25 20:18:51
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-02-27 17:08:20
  * @FilePath: /vue-element-admin/src/utils/request.js
  * @Description: axios请求拦截器
  */
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { MessageBox } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
@@ -63,14 +63,15 @@ service.interceptors.response.use(
       // 50008: 非法token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
-        MessageBox.confirm('您已登出，您可以取消以停留在此页面，或再次登录', '登录信息提示', {
+        MessageBox.confirm('您已登出，请重新登陆', '登录信息提示', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
+          store.dispatch('user/resetToken')
+          // store.dispatch('user/resetToken').then(() => {
+          //   location.reload()
+          // })
         })
       }
       return Promise.reject(new Error(res.msg || 'Error'))

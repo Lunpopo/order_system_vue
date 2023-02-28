@@ -1,8 +1,8 @@
 /*
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: lunpopo lunpopo.personal@gmail.com
- * @LastEditTime: 2023-02-25 22:10:09
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-02-28 17:17:32
  * @FilePath: /order_system_vue/src/store/modules/permission.js
  * @Description: 动态路由控制
  */
@@ -103,6 +103,7 @@ const actions = {
    * @returns
    */
   generateRoutes({ commit }, roles) {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async resolve => {
       let accessedRoutes
       if (roles.includes('admin')) {
@@ -110,6 +111,8 @@ const actions = {
         const asyncRoutes = getAsyncRoutes(routes.data) // 对路由格式进行处理
         accessedRoutes = asyncRoutes || []
       } else {
+        const routes = await getViewRoutes() // 获取到后台路由
+        const asyncRoutes = getAsyncRoutes(routes.data) // 对路由格式进行处理
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)

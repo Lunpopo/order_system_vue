@@ -1,14 +1,14 @@
 /*
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2023-02-25 16:23:05
- * @LastEditors: lunpopo lunpopo.personal@gmail.com
- * @LastEditTime: 2023-02-25 21:55:29
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-02-28 17:15:51
  * @FilePath: /order_system_vue/src/permission.js
  * @Description:
  */
 import router from './router'
 import store from './store'
-import { Message } from 'element-ui'
+// import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
@@ -58,7 +58,7 @@ router.beforeEach(async(to, from, next) => {
           // 获取用户信息失败！
           // 删除 token 并转到登录页面重新登录
           await store.dispatch('user/resetToken')
-          Message.error('登录信息过期，请重新登录！')
+          // Message.warning('登录信息过期，请重新登录！')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
         }

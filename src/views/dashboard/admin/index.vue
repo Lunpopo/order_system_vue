@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
     <!-- 入库出库总金额和总数量统计 -->
-    <el-row :gutter="40" class="panel-group">
+    <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="40" class="panel-group">
       <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div>
           <el-statistic group-separator="," :precision="2" decimal-separator="." :value="purchase_order_total_price" title="入库单总金额">
@@ -43,13 +43,13 @@
 
     <!-- <github-corner class="github-corner" /> -->
 
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
+    <panel-group v-if="checkPermission(['admin', 'data', 'test'])" @handleSetLineChartData="handleSetLineChartData" />
 
-    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+    <el-row v-if="checkPermission(['admin', 'data', 'test'])" style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
-    <el-row :gutter="32">
+    <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="32">
       <!-- <el-col :xs="24" :sm="24" :lg="8"> -->
       <el-col :span="12">
         <div class="chart-wrapper">
@@ -63,6 +63,12 @@
         </div>
       </el-col>
     </el-row>
+
+    <el-row :gutter="8">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+        <transaction-table />
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -73,6 +79,8 @@ import PanelGroup from './components/PanelGroup'
 import LineChart from './components/LineChart'
 import PieChart from './components/PieChart'
 import BarChart from './components/BarChart'
+import TransactionTable from './components/TransactionTable'
+import checkPermission from '@/utils/permission' // 权限判断函数
 
 const choiceStatistic = {
   purchase_price: {
@@ -103,7 +111,8 @@ export default {
     PanelGroup,
     LineChart,
     PieChart,
-    BarChart
+    BarChart,
+    TransactionTable
   },
 
   data() {
@@ -124,6 +133,7 @@ export default {
   },
 
   methods: {
+    checkPermission,
     // 获取入库单和出库单的总金额和总数量
     getTotalPurchaseOutbound() {
       getTotalPurchasePriceAndPiece().then((response) => {
