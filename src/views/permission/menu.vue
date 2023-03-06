@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-27 15:38:03
+ * @LastEditTime: 2023-03-02 11:34:51
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -92,7 +92,7 @@
     <!-- 弹出框 -->
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新增角色'">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-width="155px" label-position="left">
-        <el-form-item label="api名字" prop="title">
+        <el-form-item label="API名字" prop="title">
           <el-input v-model.trim="temp.title" placeholder="请输入API名字，例如：货单表格" />
         </el-form-item>
 
@@ -154,12 +154,12 @@
         </el-form-item>
 
         <el-form-item label="路由路径" prop="router_path">
-          <el-input v-model.trim="temp.router_path" placeholder="请输入路由路径，例如：/user/get_group_data" />
+          <el-input v-model.trim="temp.router_path" placeholder="请输入路由路径，例如：/get_group_data" />
         </el-form-item>
         <el-form-item label="容器路径" prop="component_path">
           <el-input v-model.trim="temp.component_path" placeholder="请输入容器路径，例如：views/product/myself-price-list" />
         </el-form-item>
-        <el-form-item label="api的描述信息" prop="description">
+        <el-form-item label="API的描述信息" prop="description">
           <el-input v-model.trim="temp.description" :autosize="{ minRows: 3, maxRows: 4}" type="textarea" placeholder="输入此API的描述信息" />
         </el-form-item>
       </el-form>
@@ -388,7 +388,6 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log(row.business_id)
         deleteMenu({ 'business_id': row.business_id }).then(() => {
           this.$notify({
             title: '删除菜单：' + row.title,

@@ -97,10 +97,10 @@ export const constantRoutes = [
   }
 ]
 
-/**
- * 异步路由
- * 需要根据用户角色动态加载的路由
- */
+// /**
+//  * 异步路由
+//  * 需要根据用户角色动态加载的路由
+//  */
 // export const asyncRoutes = [
 //   // 异步路由
 //   {
@@ -150,6 +150,31 @@ export const constantRoutes = [
 //           title: '角色权限',
 //           roles: ['admin']
 //         }
+//       }
+//     ]
+//   },
+
+//   {
+//     path: '/error',
+//     component: Layout,
+//     redirect: 'noRedirect',
+//     name: 'ErrorPages',
+//     meta: {
+//       title: 'Error Pages',
+//       icon: '404'
+//     },
+//     children: [
+//       {
+//         path: '401page',
+//         component: () => import('@/views/error-page/401'),
+//         name: 'Page401',
+//         meta: { title: '401', noCache: true }
+//       },
+//       {
+//         path: '404',
+//         component: () => import('@/views/error-page/404'),
+//         name: 'Page404',
+//         meta: { title: '404', noCache: true }
 //       }
 //     ]
 //   },

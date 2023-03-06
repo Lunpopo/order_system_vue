@@ -1,3 +1,11 @@
+<!--
+ * @Author: xie.yx yxxie@gk-estor.com
+ * @Date: 2023-02-28 17:17:55
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-03-03 09:51:02
+ * @FilePath: /order_system_vue/src/views/error-page/401.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <div class="errPage-container">
     <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="back">
@@ -51,7 +59,7 @@ export default {
       if (this.$route.query.noGoBack) {
         this.$router.push({ path: '/dashboard' })
       } else {
-        this.$router.go(-1)
+        this.$router.go(-2)
       }
     }
   }

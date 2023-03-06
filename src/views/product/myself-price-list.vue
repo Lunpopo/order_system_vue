@@ -540,8 +540,8 @@ export default {
       searchProduct(this.listQuery).then(response => {
         this.list = response.data.data
         this.total = response.data.count
-        this.listLoading = false
       })
+      this.listLoading = false
     },
 
     // 生成时间戳，用来更新创建框的缓存

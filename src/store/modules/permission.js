@@ -2,7 +2,7 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-28 17:17:32
+ * @LastEditTime: 2023-03-03 14:59:25
  * @FilePath: /order_system_vue/src/store/modules/permission.js
  * @Description: 动态路由控制
  */
@@ -106,6 +106,9 @@ const actions = {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async resolve => {
       let accessedRoutes
+
+      // 这块是后端传过来的动态路由dict
+      // --------snip--------
       if (roles.includes('admin')) {
         const routes = await getViewRoutes() // 获取到后台路由
         const asyncRoutes = getAsyncRoutes(routes.data) // 对路由格式进行处理
@@ -115,6 +118,16 @@ const actions = {
         const asyncRoutes = getAsyncRoutes(routes.data) // 对路由格式进行处理
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
+      // --------snip--------
+      // // 这块是前端写死动态路由的部分
+      // // --------snip--------
+      // if (roles.includes('admin')) {
+      //   accessedRoutes = asyncRoutes || []
+      // } else {
+      //   accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      // }
+      // // --------snip--------
+
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

@@ -2,12 +2,13 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-27 17:08:20
+ * @LastEditTime: 2023-03-03 15:45:08
  * @FilePath: /vue-element-admin/src/utils/request.js
  * @Description: axios请求拦截器
  */
+import router from '../router'
 import axios from 'axios'
-import { MessageBox } from 'element-ui'
+import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
@@ -26,7 +27,7 @@ service.interceptors.request.use(
     if (store.getters.token) {
       // let each request carry token
       // 根据实际情况修改
-      config.headers['Authentication-Token'] = getToken()
+      config.headers['Authorization'] = getToken()
     }
     return config
   },
@@ -54,12 +55,6 @@ service.interceptors.response.use(
 
     // 如果自定义代码不是20000，则判断为错误。
     if (res.code !== 20000) {
-      // Message({
-      //   message: res.msg || 'Error',
-      //   type: 'error',
-      //   duration: 5 * 1000
-      // })
-
       // 50008: 非法token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
@@ -69,25 +64,27 @@ service.interceptors.response.use(
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken')
-          // store.dispatch('user/resetToken').then(() => {
-          //   location.reload()
-          // })
         })
       }
       return Promise.reject(new Error(res.msg || 'Error'))
     } else {
       return res
     }
+  }, error => {
+    if (error.response.status === 401) {
+      console.log('401了，兄弟，你没有权限访问该页面（功能）！')
+      router.push({ name: 'Page401' })
+    } else if (error.response.status === 500) {
+      // 服务器内部报错
+      Message({
+        message: error.response.data.msg,
+        type: 'error',
+        duration: 5 * 1000,
+        showClose: true
+      })
+    }
+    return Promise.reject(error.response.data)
   }
-  // ,error => {
-  //   console.log('err' + error) // for debug
-  //   Message({
-  //     message: error.message,
-  //     type: 'error',
-  //     duration: 5 * 1000
-  //   })
-  //   return Promise.reject(error)
-  // }
 )
 
 export default service

@@ -1,3 +1,11 @@
+<!--
+ * @Author: xie.yx yxxie@gk-estor.com
+ * @Date: 2023-02-28 17:17:55
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-03-03 10:23:07
+ * @FilePath: /order_system_vue/src/components/SizeSelect/index.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <el-dropdown trigger="click" @command="handleSetSize">
     <div>
@@ -17,10 +25,10 @@ export default {
   data() {
     return {
       sizeOptions: [
-        { label: 'Default', value: 'default' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'Small', value: 'small' },
-        { label: 'Mini', value: 'mini' }
+        { label: '默认大小', value: 'default' },
+        { label: '中等大小', value: 'medium' },
+        { label: '小', value: 'small' },
+        { label: '迷你', value: 'mini' }
       ]
     }
   },

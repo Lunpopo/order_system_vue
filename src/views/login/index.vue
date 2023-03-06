@@ -48,30 +48,7 @@
       <el-button :loading="loading" type="primary" style="width:100%; margin-bottom:30px;" @click.native.prevent="handleLogin">
         登录
       </el-button>
-
-      <!-- <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
-      </div> -->
     </el-form>
-
-    <!-- <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business simulation! ! !
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog> -->
   </div>
 </template>
 
@@ -117,20 +94,12 @@ export default {
     }
   },
 
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
-
   mounted() {
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
-  },
-
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
   },
 
   methods: {
@@ -164,9 +133,11 @@ export default {
               this.loading = false
             })
             .catch(err => {
-              this.$message.error(err) // 登录失败提示错误
-              this.loading = false
+              console.log('登录出错了：')
+              console.log(err)
+              // this.$message.error(err.msg) // 登录失败提示错误
             })
+          this.loading = false
         } else {
           console.log('error submit!!')
           return false
@@ -187,9 +158,6 @@ export default {
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
 $bg:#283443;
 $light_gray:#fff;
 $cursor: #fff;
