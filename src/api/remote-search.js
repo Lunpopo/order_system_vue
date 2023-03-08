@@ -8,3 +8,12 @@ export function transactionList(query) {
     params: query
   })
 }
+
+// 获取产品交易信息api
+export function productTransactionList(query) {
+  return request({
+    url: '/order/get_product_transaction_list',
+    method: 'get',
+    params: query
+  })
+}

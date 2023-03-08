@@ -2,13 +2,21 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-02 11:57:46
+ * @LastEditTime: 2023-03-08 17:12:37
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 各大api的权限（也就是功能的权限）
 -->
 <template>
   <div class="app-container">
     <el-button type="primary" @click="handleAddApi">新增api（功能）权限</el-button>
+
+    <!-- 过滤组件 -->
+    <div class="filter-container">
+      <el-input v-model.trim="query.title" placeholder="请输入API名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        搜索
+      </el-button>
+    </div>
 
     <el-table v-loading="listLoading" :data="apiList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="API名字">
@@ -44,7 +52,7 @@
     </el-table>
 
     <!-- 页面控制 -->
-    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="get_api" />
+    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="handleFilter" />
 
     <!-- 弹出框 -->
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑API功能':'新增API功能'">
@@ -82,11 +90,13 @@
 
 <script>
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
 import { getAllPermission } from '@/api/menu'
-import { getApi, addApi, deleteApi, updateApi } from '@/api/api'
+import { searchApi, addApi, deleteApi, updateApi } from '@/api/api'
 
 export default {
   components: { Pagination },
+  directives: { waves },
   data() {
     return {
       // 分页显示菜单列表
@@ -126,13 +136,13 @@ export default {
   },
   created() {
     // 获取所有的功能api列表
-    this.get_api()
+    this.handleFilter()
   },
   methods: {
-    // 获取所有的功能api
-    get_api() {
+    // 搜索功能
+    handleFilter() {
       this.listLoading = true
-      getApi(this.query).then((response) => {
+      searchApi(this.query).then(response => {
         this.apiList = response.data.data
         this.total = response.data.count
       })
@@ -185,7 +195,7 @@ export default {
             })
 
             // 刷新表格数据
-            this.get_api()
+            this.handleFilter()
           })
         }
       })
@@ -206,7 +216,7 @@ export default {
             })
 
             // 刷新表格数据
-            this.get_api()
+            this.handleFilter()
           })
         }
       })

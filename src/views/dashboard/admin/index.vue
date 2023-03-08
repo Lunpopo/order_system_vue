@@ -64,9 +64,17 @@
       </el-col>
     </el-row>
 
-    <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table />
+    <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="32">
+      <!-- <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;"> -->
+      <el-col :span="12">
+        <div class="chart-wrapper">
+          <transaction-table />
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <div class="chart-wrapper">
+          <product-transaction-table />
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -80,6 +88,7 @@ import LineChart from './components/LineChart'
 import PieChart from './components/PieChart'
 import BarChart from './components/BarChart'
 import TransactionTable from './components/TransactionTable'
+import ProductTransactionTable from './components/ProductTransactionTable'
 import checkPermission from '@/utils/permission' // 权限判断函数
 
 const choiceStatistic = {
@@ -112,7 +121,8 @@ export default {
     LineChart,
     PieChart,
     BarChart,
-    TransactionTable
+    TransactionTable,
+    ProductTransactionTable
   },
 
   data() {
@@ -217,12 +227,12 @@ export default {
   background-color: rgb(240, 242, 245);
   position: relative;
 
-  .github-corner {
-    position: absolute;
-    top: 0px;
-    border: 0;
-    right: 0;
-  }
+  // .github-corner {
+  //   position: absolute;
+  //   top: 0px;
+  //   border: 0;
+  //   right: 0;
+  // }
 
   .chart-wrapper {
     background: #fff;
