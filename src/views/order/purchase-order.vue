@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-15 10:16:19
+ * @LastEditTime: 2023-03-15 00:31:37
  * @FilePath: /vue-element-admin/src/views/tab/order.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -10,8 +10,8 @@
   <div class="app-container">
     <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">添加入库单</el-button>
 
-    <el-row>
-      <el-col v-for="(domain, index) in temp" :key="domain.id" :span="10" :offset="1" style="margin-top: 20px">
+    <el-row v-loading="cardListLoading">
+      <el-col v-for="(domain, index) in temp" :key="domain.id" :xs="22" :sm="22" :lg="10" :offset="1" style="margin-top: 20px">
         <el-card :body-style="{ padding: '0px' }">
           <div style="padding: 14px;">
             <!-- 本次入库的标题 -->
@@ -31,8 +31,9 @@
     </el-row>
 
     <!-- 查看详情页面弹出框 -->
-    <el-dialog :title="textMap[dialogStatus]" width="60%" :visible.sync="viewDetail">
+    <el-dialog :title="textMap[dialogStatus]" width="80%" :visible.sync="viewDetail">
       <el-table
+        v-loading="listLoading"
         :data="currentProduct"
         border
         style="width: 100%"
@@ -95,7 +96,7 @@
 
     <!-- 添加 按钮弹出框 -->
     <el-dialog :title="textMap[dialogStatus]" width="60%" :visible.sync="dialogFormVisible" @close="cancelAddOrder">
-      <el-form ref="dataForm" :rules="rules" :model="dynamicValidateForm" label-width="100px">
+      <el-form ref="dataForm" :rules="rules" :model="dynamicValidateForm" label-width="155px" label-position="left">
         <el-form-item prop="title" label="入库单标题：">
           <el-input v-model.trim="dynamicValidateForm.title" />
         </el-form-item>
@@ -151,7 +152,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="备注" prop="remarks" width="110px" align="center">
+            <el-table-column label="备注" prop="remarks" align="center">
               <template slot-scope="{row}">
                 <span>{{ row.remarks }}</span>
               </template>
@@ -168,11 +169,11 @@
           <el-button type="primary" @click="innerVisible = true">点击添加入库产品</el-button>
         </el-form-item>
 
-        <el-form-item label-width="120px" label="合计（元）：" prop="total_price">
+        <el-form-item label="合计（元）：" prop="total_price">
           <el-input-number v-model.trim="dynamicValidateForm.total_price" disabled :controls="true" :precision="2" />
         </el-form-item>
 
-        <el-form-item label-width="120px" label="合计（件）：" prop="total_piece">
+        <el-form-item label="合计（件）：" prop="total_piece">
           <el-input-number v-model.trim="dynamicValidateForm.total_piece" disabled :controls="true" />
         </el-form-item>
 
@@ -193,6 +194,7 @@
 
         <el-divider />
         <el-table
+          v-loading="embeddedListLoading"
           :data="productList"
           border
           style="width: 100%"
@@ -242,9 +244,9 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="数量（件）" min-width="170px" prod="quantity">
+          <el-table-column label="数量（件）" min-width="210px" prod="quantity">
             <template slot-scope="{row, $index}">
-              <el-input-number v-model.trim="row.quantity" :value="row.quantity" :controls="true" placeholder="请输入产品数量" @change="calProductPrice(row, $index)" />
+              <el-input-number v-model.trim="row.quantity" :value="row.quantity" :controls="true" controls-position="right" size="medium" placeholder="请输入产品数量" @change="calProductPrice(row, $index)" />
             </template>
           </el-table-column>
         </el-table>
@@ -274,33 +276,6 @@
   </div>
 </template>
 
-<style>
-  .bottom {
-    margin-top: 13px;
-    line-height: 12px;
-  }
-
-  .button {
-    padding: 0;
-    float: right;
-  }
-
-  .image {
-    width: 100%;
-    display: block;
-  }
-
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-
-  .clearfix:after {
-      clear: both
-  }
-</style>
-
 <script>
 import { addPurchaseOrder, getPurchaseOrder, getPurchaseProductDetails, delPurchaseOrder } from '@/api/purchase_order'
 import { searchProduct } from '@/api/product'
@@ -329,6 +304,10 @@ export default {
       }
     }
     return {
+      // 内嵌搜索加载圈圈
+      embeddedListLoading: true,
+      cardListLoading: true,
+      listLoading: true,
       // 动态表单的提交内容
       dynamicValidateForm: {
         title: this.getTime() + '日入库',
@@ -409,10 +388,6 @@ export default {
       const yy = new Date().getFullYear()
       const mm = new Date().getMonth() + 1
       const dd = new Date().getDate()
-      // const hh = new Date().getHours()
-      // const mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
-      // const ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds()
-      // return yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss
       return yy + '-' + mm + '-' + dd
     },
     // 取消添加订单
@@ -430,11 +405,13 @@ export default {
 
     // 搜索功能
     handleFilter() {
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
-        this.listLoading = false
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.embeddedListLoading = false
       })
     },
 
@@ -497,11 +474,13 @@ export default {
       })
 
       // 获取所有的产品
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
-        this.listLoading = false
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.embeddedListLoading = false
       })
     },
 
@@ -512,8 +491,12 @@ export default {
       const params = {
         'purchase_order_id': business_id
       }
+      this.listLoading = true
       getPurchaseProductDetails(params).then((response) => {
         this.currentProduct = response.data.data
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
 
@@ -530,6 +513,7 @@ export default {
         const params = {
           'purchase_order_id': business_id
         }
+        this.listLoading = true
         // 根据 business_id 删除此条入库数据
         delPurchaseOrder(params).then((response) => {
           this.$notify({
@@ -539,6 +523,9 @@ export default {
             duration: 2000
           })
           this.temp.splice(index, 1)
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -548,7 +535,7 @@ export default {
       })
     },
 
-    // 点击要删除此产品
+    // 内嵌产品的删除产品
     handleDeleteProduct(index) {
       this.$confirm('是否确认删除此条产品数据？', '提示', {
         confirmButtonText: '确定',
@@ -604,6 +591,8 @@ export default {
             }
           })
           this.dynamicValidateForm.domains = deleteZeroProduct
+
+          this.listLoading = true
           // 发送到后台，添加该次入库单
           addPurchaseOrder(this.dynamicValidateForm).then((response) => {
             this.$notify({
@@ -615,9 +604,12 @@ export default {
             this.temp = []
             this.dynamicValidateForm = {}
             this.getData()
+            this.listLoading = false
 
             // 关闭弹出框
             this.dialogFormVisible = false
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -625,12 +617,54 @@ export default {
 
     // 获取入库单数据
     getData() {
+      this.cardListLoading = true
       // 发送到后台，添加该次入库单
       getPurchaseOrder(this.listQuery).then((response) => {
         this.temp = response.data.data
         this.total = response.data.count
+        this.cardListLoading = false
+      }).catch(() => {
+        this.cardListLoading = false
       })
     }
   }
 }
 </script>
+
+<style>
+  .bottom {
+    margin-top: 13px;
+    line-height: 12px;
+  }
+
+  .button {
+    padding: 0;
+    float: right;
+  }
+
+  .image {
+    width: 100%;
+    display: block;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+      display: table;
+      content: "";
+  }
+
+  .clearfix:after {
+      clear: both
+  }
+
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+  }
+</style>

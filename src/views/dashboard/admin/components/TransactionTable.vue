@@ -2,12 +2,13 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2023-02-27 09:30:06
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-08 16:45:18
+ * @LastEditTime: 2023-03-13 23:15:33
  * @FilePath: /order_system_vue/src/views/dashboard/admin/components/TransactionTable.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <el-table
+    v-loading="listLoading"
     :data="list"
     style="width: 100%;padding-top: 15px;"
     :row-class-name="tableRowClassName"
@@ -16,7 +17,7 @@
   >
     <el-table-column type="index" :index="indexMethod" prop="index" />
 
-    <el-table-column label="经销商名" min-width="200" prop="name">
+    <el-table-column label="经销商名" prop="name">
       <template slot-scope="scope">
         {{ scope.row.name }}
       </template>
@@ -36,6 +37,7 @@ import { transactionList } from '@/api/remote-search'
 export default {
   data() {
     return {
+      listLoading: true,
       list: null
     }
   },
@@ -82,10 +84,14 @@ export default {
     },
 
     fetchData() {
+      this.listLoading = true
       transactionList().then(response => {
         // this.list = response.data.items.slice(0, 8)
         this.list = response.data.items
         // console.log(this.list)
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     }
   }

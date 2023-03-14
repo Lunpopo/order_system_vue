@@ -2,7 +2,7 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-03 15:45:08
+ * @LastEditTime: 2023-03-14 17:01:35
  * @FilePath: /vue-element-admin/src/utils/request.js
  * @Description: axios请求拦截器
  */
@@ -63,27 +63,41 @@ service.interceptors.response.use(
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          store.dispatch('user/resetToken')
+          store.dispatch('user/resetToken').then(() => {
+            location.reload()
+          })
         })
+        // }).then(() => {
+        //   store.dispatch('user/resetToken')
+        // })
       }
-      return Promise.reject(new Error(res.msg || 'Error'))
+      // return Promise.reject(new Error(res.msg || 'Error'))
+      return Promise.reject(res.msg)
     } else {
       return res
     }
-  }, error => {
-    if (error.response.status === 401) {
-      console.log('401了，兄弟，你没有权限访问该页面（功能）！')
-      router.push({ name: 'Page401' })
-    } else if (error.response.status === 500) {
-      // 服务器内部报错
-      Message({
-        message: error.response.data.msg,
-        type: 'error',
-        duration: 5 * 1000,
-        showClose: true
-      })
+  }, (error) => {
+    if (error.response !== null && error.response !== undefined && error.response !== '') {
+      const res = error.response
+      if (res.status === 401) {
+        console.log('401了，兄弟，你没有权限访问该页面（功能）！')
+        // TODO 如果又是 401 然后 token又过期了，就直接跳到login页面
+        router.push({ name: 'Page401' })
+      } else if (res.status === 500) {
+        // 服务器内部报错
+        Message({
+          message: res.data.msg,
+          type: 'error',
+          duration: 5 * 1000,
+          showClose: true
+        })
+        return Promise.reject(res.data.msg)
+      }
+
+      return Promise.reject(new Error(error))
+    } else {
+      return Promise.reject(new Error(error))
     }
-    return Promise.reject(error.response.data)
   }
 )
 

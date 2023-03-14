@@ -43,34 +43,34 @@
             <el-form-item label="商品 ID">
               <span>{{ props.row.id }}</span>
             </el-form-item>
-            <el-form-item label="商品名称">
+            <el-form-item label="产品名称">
               <span>{{ props.row.product_name }}</span>
             </el-form-item>
-            <el-form-item label="归属">
+            <el-form-item label="产品归属经销商">
               <span>{{ props.row.belong_to }}</span>
             </el-form-item>
-            <el-form-item label="规格（ML）">
+            <el-form-item label="产品规格（ML）">
               <span>{{ props.row.specifications }}</span>
             </el-form-item>
-            <el-form-item label="香型">
+            <el-form-item label="产品香型">
               <span>{{ props.row.scent_type }}</span>
             </el-form-item>
             <el-form-item label="每件规格（瓶）">
               <span>{{ props.row.specification_of_piece }}</span>
             </el-form-item>
-            <el-form-item label="出厂价（元/瓶）">
+            <el-form-item label="产品出厂价（元/瓶）">
               <span>{{ props.row.unit_price }}</span>
             </el-form-item>
             <el-form-item label="每件价格（元）">
               <span>{{ props.row.price_of_piece }}</span>
             </el-form-item>
-            <el-form-item label="批发价（元/瓶）">
+            <el-form-item label="产品批发价（元/瓶）">
               <span>{{ props.row.wholesale_price }}</span>
             </el-form-item>
             <el-form-item label="建议零售价（元/瓶）">
               <span>{{ props.row.suggested_retail_price }}</span>
             </el-form-item>
-            <el-form-item label="扫码价（元/瓶）">
+            <el-form-item label="产品扫码价（元/瓶）">
               <span>{{ props.row.scanning_price }}</span>
             </el-form-item>
             <el-form-item label="备注">
@@ -104,7 +104,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="出厂价（元/瓶）" sortable="custom" prop="unit_price" class-name="status-col">
+      <el-table-column label="产品出厂价（元/瓶）" sortable="custom" prop="unit_price" class-name="status-col">
         <template slot-scope="{row}">
           <span>{{ row.unit_price }}</span>
         </template>
@@ -116,7 +116,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="批发价（元/瓶）" sortable="custom" prop="wholesale_price" align="center">
+      <el-table-column label="产品批发价（元/瓶）" sortable="custom" prop="wholesale_price" align="center">
         <template slot-scope="{row}">
           <span>{{ row.wholesale_price }}</span>
         </template>
@@ -128,7 +128,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="扫码价（元/瓶）" sortable="custom" prop="scanning_price" align="center">
+      <el-table-column label="产品扫码价（元/瓶）" sortable="custom" prop="scanning_price" align="center">
         <template slot-scope="{row}">
           <span>{{ row.scanning_price }}</span>
         </template>
@@ -182,7 +182,7 @@
 
     <!-- 编辑按钮弹出框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="155px" style="width: 500px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-width="155px" label-position="left">
         <el-form-item label="属于哪里的经销商" prop="belong_to">
           <el-select v-model.trim="temp.belong_to" placeholder="请选择经销商" clearable class="filter-item" @change="selectProductDealer">
             <el-option v-for="item in dealerListOptions" :key="item.id" :label="item.dealer_name" :value="item.dealer_name" />
@@ -190,39 +190,40 @@
         </el-form-item>
 
         <el-form-item label="产品名称" prop="product_name">
-          <el-input v-model.trim="temp.product_name" style="width: auto; float: left;" disabled /> <el-button type="primary" style="float: left;" :disabled="temp.belong_to === undefined || temp.belong_to === ''" @click="select_product">点击选择产品</el-button>
+          <el-input v-model.trim="temp.product_name" style="width: auto; float: left;" disabled placeholder="请选择基准产品" />
+          <el-button type="primary" style="float: left;" :disabled="temp.belong_to === undefined || temp.belong_to === ''" @click="select_product">点击选择产品</el-button>
         </el-form-item>
 
-        <el-form-item label="规格（ML）" prop="specifications">
-          <el-input v-model.trim="temp.specifications" style="width: auto;" disabled />
+        <el-form-item label="产品规格（ML）" prop="specifications">
+          <el-input v-model.trim="temp.specifications" style="width: auto;" disabled placeholder="产品规格（ML）" />
         </el-form-item>
 
-        <el-form-item label="香型" prop="scent_type">
-          <el-input v-model.trim="temp.scent_type" style="width: auto;" disabled />
+        <el-form-item label="产品香型" prop="scent_type">
+          <el-input v-model.trim="temp.scent_type" style="width: auto;" disabled placeholder="产品香型" />
         </el-form-item>
 
         <el-form-item label="每件规格（瓶）" prop="specification_of_piece">
-          <el-input v-model.trim="temp.specification_of_piece" style="width: auto;" disabled @input="calPiecePrice" />
+          <el-input v-model.trim="temp.specification_of_piece" style="width: auto;" disabled placeholder="每件规格（瓶）" @input="calPiecePrice" />
         </el-form-item>
 
-        <el-form-item label="出厂价（元/瓶）" prop="unit_price">
-          <el-input-number v-model.trim="temp.unit_price" :controls="true" :precision="2" @input="calPiecePrice" />
+        <el-form-item label="产品出厂价（元/瓶）" prop="unit_price">
+          <el-input-number v-model.trim="temp.unit_price" :controls="true" :precision="2" placeholder="请输入产品出厂价（元/瓶）" @input="calPiecePrice" />
         </el-form-item>
 
         <el-form-item label="每件价格（元）" prop="price_of_piece">
-          <el-input v-model.trim="temp.price_of_piece" style="width: auto;" disabled :precision="2" />
+          <el-input v-model.trim="temp.price_of_piece" style="width: auto;" disabled :precision="2" placeholder="每件价格（元）" />
         </el-form-item>
 
-        <el-form-item label="批发价（元/瓶）" prop="wholesale_price">
-          <el-input-number v-model.trim="temp.wholesale_price" :controls="true" :precision="2" />
+        <el-form-item label="产品批发价（元/瓶）" prop="wholesale_price">
+          <el-input-number v-model.trim="temp.wholesale_price" :controls="true" :precision="2" placeholder="请输入产品批发价（元/瓶）" />
         </el-form-item>
 
         <el-form-item label="建议零售价（元/瓶）" prop="suggested_retail_price">
-          <el-input-number v-model.trim="temp.suggested_retail_price" :controls="true" :precision="2" />
+          <el-input-number v-model.trim="temp.suggested_retail_price" :controls="true" :precision="2" placeholder="请输入建议零售价（元/瓶）" />
         </el-form-item>
 
-        <el-form-item label="扫码价（元/瓶）" prop="scanning_price">
-          <el-input-number v-model.trim="temp.scanning_price" :controls="true" :precision="2" />
+        <el-form-item label="产品扫码价（元/瓶）" prop="scanning_price">
+          <el-input-number v-model.trim="temp.scanning_price" :controls="true" :precision="2" placeholder="请输入产品扫码价（元/瓶）" />
         </el-form-item>
 
         <el-form-item label="备注" prop="remarks">
@@ -242,6 +243,7 @@
 
         <el-divider />
         <el-table
+          v-loading="embeddedListLoading"
           :data="productList"
           border
           style="width: 100%"
@@ -258,7 +260,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="规格（ML）" sortable prod="specifications">
+          <el-table-column label="产品规格（ML）" sortable prod="specifications">
             <template slot-scope="{row}">
               <span>{{ row.specifications }} </span>
             </template>
@@ -308,22 +310,6 @@
   </div>
 </template>
 
-<style>
-  /* 产看详情的 style */
-  .demo-table-expand {
-    font-size: 0;
-  }
-  .demo-table-expand label {
-    width: 90px;
-    color: #99a9bf;
-  }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 50%;
-  }
-</style>
-
 <script>
 import { getAllDealerProduct, getDealerList, updateDealerProduct, deleteDealerProduct, dealerProductMultiDelete, addDealerProduct, searchDealerProduct } from '@/api/dealer_product'
 import { searchProduct } from '@/api/product'
@@ -356,6 +342,8 @@ export default {
 
       // 内嵌搜索产品页面
       productInnerVisible: false,
+      // 内嵌搜索加载条
+      embeddedListLoading: true,
       productList: [],
       // 内嵌产品列表的总量
       productTotal: 0,
@@ -435,8 +423,6 @@ export default {
 
     // 下拉选择经销商 触发事件
     selectDealer(value) {
-      // 打开加载圈圈
-      this.listLoading = true
       this.listQuery.dealer_name = value
       sessionStorage.setItem('selectDealer', value)
       this.handleFilter()
@@ -451,9 +437,10 @@ export default {
 
     // 获取经销商的下拉框数据
     getDealerSelection() {
+      this.listLoading = true
       getDealerList().then((response) => {
-        this.listLoading = true
         this.dealerListOptions = response.data.data
+        this.listLoading = false
 
         // 手动设 长沙周艳艳 为默认
         const dealer_name = sessionStorage.getItem('selectDealer')
@@ -468,6 +455,8 @@ export default {
 
         // 获取列表数据
         this.handleFilter()
+      }).catch(() => {
+        this.listLoading = false
       })
     },
 
@@ -495,6 +484,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          this.listLoading = true
           // 放需要删除的业务id，每一次都进行清除变量
           const business_ids = []
           this.list = this.list.filter(
@@ -515,6 +505,9 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.listLoading = false
+          }).catch(() => {
+            this.listLoading = false
           })
         }).catch(() => {
           this.$message({
@@ -523,11 +516,11 @@ export default {
           })
         })
       } catch (error) {
-        this.loading = false
+        this.listLoading = false
         console.log('批量删除出错了：')
         console.log(error)
       } finally {
-        this.loading = false
+        this.listLoading = false
       }
     },
 
@@ -553,15 +546,19 @@ export default {
         this.list = response.data.data
         this.total = response.data.count
         this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
 
     // 内嵌产品搜索功能
     handleProductFilter() {
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
+        this.embeddedListLoading = false
+      }).catch(() => {
         this.listLoading = false
       })
     },
@@ -577,12 +574,14 @@ export default {
       })
 
       // 获取所有的产品
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
 
       // 设置经销商
       this.temp.belong_to = sessionStorage.getItem('selectDealer')
@@ -610,6 +609,8 @@ export default {
 
             // 刷新表格数据
             this.getDealerSelection()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -619,6 +620,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           // 更新表格
           updateDealerProduct(this.temp).then(() => {
             this.dialogFormVisible = false
@@ -628,6 +630,8 @@ export default {
               type: 'success',
               duration: 2000
             })
+          }).catch(() => {
+            this.listLoading = false
           })
 
           // 刷新表格数据
@@ -663,6 +667,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         deleteDealerProduct(row).then(() => {
           this.dialogFormVisible = false
           this.$notify({
@@ -672,6 +677,8 @@ export default {
             duration: 2000
           })
           this.list.splice(index, 1)
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -683,7 +690,6 @@ export default {
 
     // // 处理下载 Excel 表格数据
     handleDownload() {
-      this.downloadLoading = true
       let message = ''
       let download_title = ''
       if (this.listQuery.dealer_name !== undefined && this.listQuery.dealer_name !== null && this.listQuery.dealer_name !== '') {
@@ -699,11 +705,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.downloadLoading = true
         // 从后台获取所要下载的所有数据
         getAllDealerProduct(this.listQuery).then((response) => {
           const res = response.data.data
           import('@/vendor/Export2Excel').then(excel => {
-            const tHeader = ['产品名称', '规格（ML）', '香型', '每件规格（瓶）', '出厂价（元/瓶）', '建议零售价（元）', '扫码价（元）', '每件价格（元）']
+            const tHeader = ['产品名称', '产品规格（ML）', '产品香型', '每件规格（瓶）', '产品出厂价（元/瓶）', '建议零售价（元）', '产品扫码价（元）', '每件价格（元）']
             const filterVal = ['product_name', 'specifications', 'scent_type', 'specification_of_piece', 'unit_price', 'suggested_retail_price', 'scanning_price', 'price_of_piece']
             const data = this.formatJson(filterVal, res)
 
@@ -718,13 +725,14 @@ export default {
 
             this.downloadLoading = false
           })
+        }).catch(() => {
+          this.downloadLoading = false
         })
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '操作已取消！'
         })
-        this.downloadLoading = false
       })
     },
     // 格式转换
@@ -757,3 +765,30 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* 产看详情的 style */
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 90px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
+  }
+
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+  }
+</style>

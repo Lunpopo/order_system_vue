@@ -2,23 +2,23 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-08 17:12:37
+ * @LastEditTime: 2023-03-15 00:36:22
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 各大api的权限（也就是功能的权限）
 -->
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="handleAddApi">新增api（功能）权限</el-button>
-
     <!-- 过滤组件 -->
     <div class="filter-container">
-      <el-input v-model.trim="query.title" placeholder="请输入API名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model.trim="query.title" placeholder="请输入搜索内容" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
     </div>
 
-    <el-table v-loading="listLoading" :data="apiList" style="width: 100%;margin-top:30px;" border>
+    <el-button class="filter-item" type="primary" style="margin-bottom: 15px;" icon="el-icon-edit" @click="handleAddApi">新增api（功能）权限</el-button>
+
+    <el-table v-loading="listLoading" :data="apiList" style="width: 100%;" border>
       <el-table-column align="center" label="API名字">
         <template slot-scope="{row}">
           {{ row.title }}
@@ -145,8 +145,10 @@ export default {
       searchApi(this.query).then(response => {
         this.apiList = response.data.data
         this.total = response.data.count
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 获取所有的api权限列表
@@ -154,8 +156,10 @@ export default {
       this.listLoading = true
       getAllPermission().then((response) => {
         this.api_permission_options = response.data.data
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 点击新增api
@@ -182,6 +186,7 @@ export default {
     addApi() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           addApi(this.temp).then(() => {
             // 前端新增一条api
             this.apiList.unshift(this.temp)
@@ -194,8 +199,12 @@ export default {
               duration: 2000
             })
 
+            this.listLoading = false
+
             // 刷新表格数据
             this.handleFilter()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -205,6 +214,7 @@ export default {
     updateApi() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           updateApi(this.temp).then(() => {
             this.dialogVisible = false
 
@@ -215,8 +225,12 @@ export default {
               duration: 2000
             })
 
+            this.listLoading = false
+
             // 刷新表格数据
             this.handleFilter()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -243,6 +257,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         deleteApi({ 'business_id': row.business_id }).then(() => {
           this.$notify({
             title: '删除API：' + row.title,
@@ -251,6 +266,9 @@ export default {
             duration: 2000
           })
           this.apiList.splice(index, 1)
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -262,3 +280,16 @@ export default {
   }
 }
 </script>
+
+<style>
+/* 移动端的适配 */
+@media screen and (max-width: 500px) {
+  .el-dialog {
+    width: 90% !important;
+  }
+
+  .el-form-item__content {
+    margin: 0 !important;
+  }
+}
+</style>

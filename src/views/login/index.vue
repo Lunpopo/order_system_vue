@@ -65,8 +65,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -136,10 +136,12 @@ export default {
               console.log('登录出错了：')
               console.log(err)
               // this.$message.error(err.msg) // 登录失败提示错误
+              this.loading = false
             })
           this.loading = false
         } else {
           console.log('error submit!!')
+          this.loading = false
           return false
         }
       })

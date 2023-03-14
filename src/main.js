@@ -1,8 +1,8 @@
 /*
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
- * @LastEditors: lunpopo lunpopo.personal@gmail.com
- * @LastEditTime: 2023-02-25 20:13:00
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-03-08 18:07:10
  * @FilePath: /order_system_vue2/Users/popolun/test_folder/vue-element-admin/src/main.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -37,10 +37,10 @@ import * as filters from './filters' // global filters
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+// if (process.env.NODE_ENV === 'production') {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size

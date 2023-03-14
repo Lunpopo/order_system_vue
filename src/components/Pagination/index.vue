@@ -1,6 +1,7 @@
 <template>
   <div :class="{'hidden':hidden}" class="pagination-container">
     <el-pagination
+      small
       :background="background"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
@@ -11,6 +12,17 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+    <!-- <el-pagination
+      small
+      :current-page.sync="currentPage"
+      :page-size.sync="pageSize"
+      :page-sizes="pageSizes"
+      layout="prev, pager, next"
+      :total="total"
+      v-bind="$attrs"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    /> -->
   </div>
 </template>
 
@@ -40,7 +52,8 @@ export default {
     },
     layout: {
       type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
+      // default: 'total, sizes, prev, pager, next, jumper'
+      default: 'total, prev, pager, next'
     },
     background: {
       type: Boolean,
@@ -55,6 +68,7 @@ export default {
       default: false
     }
   },
+
   computed: {
     currentPage: {
       get() {
@@ -73,7 +87,20 @@ export default {
       }
     }
   },
+  mounted() {
+    // 手机端的分页适配
+    if (this._isMobile()) {
+      this.layout = 'total, prev, pager, next'
+    } else {
+      this.layout = 'total, sizes, prev, pager, next, jumper'
+    }
+  },
+
   methods: {
+    _isMobile() {
+      const flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+      return flag
+    },
     handleSizeChange(val) {
       this.$emit('pagination', { page: this.currentPage, limit: val })
       if (this.autoScroll) {

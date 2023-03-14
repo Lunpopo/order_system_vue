@@ -2,7 +2,7 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-27 15:40:08
+ * @LastEditTime: 2023-03-14 21:31:16
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -10,7 +10,7 @@
   <div class="app-container">
     <el-button type="primary" @click="handleAddRole">新增角色</el-button>
 
-    <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
+    <el-table v-loading="listLoading" :data="rolesList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="角色权限key" width="220">
         <template slot-scope="scope">
           {{ scope.row.group_name }}
@@ -79,6 +79,7 @@ import { getRoutes, getRoutesByRole, getRoles, addRole, deleteRole, updateRole }
 export default {
   data() {
     return {
+      listLoading: true,
       role: {},
       routes: [],
       rolesList: [],
@@ -113,6 +114,7 @@ export default {
 
       if (isEdit) {
         // 更新角色
+        this.listLoading = true
         updateRole(this.role).then(() => {
           for (let index = 0; index < this.rolesList.length; index++) {
             if (this.rolesList[index].business_id === this.role.business_id) {
@@ -120,6 +122,8 @@ export default {
               break
             }
           }
+          this.listLoading = false
+
           // 更新成功提示框
           this.dialogVisible = false
           this.$notify({
@@ -128,39 +132,58 @@ export default {
             type: 'success',
             duration: 2000
           })
+        }).catch(() => {
+          this.listLoading = false
         })
       } else {
         // 新增角色
-        const { data } = await addRole(this.role)
-        this.rolesList.push(data)
-        this.dialogVisible = false
-        // 新增成功提示框
-        this.$notify({
-          title: '新增角色：' + group_name,
-          message: '新增成功！',
-          type: 'success',
-          duration: 2000
+        // const { data } = await addRole(this.role)
+        this.listLoading = true
+        addRole(this.role).then((response) => {
+          this.rolesList.push(response.data)
+          this.dialogVisible = false
+          // 新增成功提示框
+          this.$notify({
+            title: '新增角色：' + group_name,
+            message: '新增成功！',
+            type: 'success',
+            duration: 2000
+          })
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }
     },
 
     // 获取所有的路由（菜单/api 列表）
     async getRoutes() {
-      const res = await getRoutes()
-      this.serviceRoutes = res.data
-      this.routes = this.generateRoutes(res.data)
+      this.listLoading = true
+      getRoutes().then((response) => {
+        this.serviceRoutes = response.data
+        this.routes = this.generateRoutes(response.data)
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
+      })
     },
 
     // 获取所有的角色信息
     async getRoles() {
-      const res = await getRoles()
-      this.rolesList = res.data.data
+      // const res = await getRoles()
+      // this.rolesList = res.data.data
+      this.listLoading = true
+      getRoles().then((response) => {
+        this.rolesList = response.data.data
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
+      })
     },
 
     // 重塑路由结构，使其看起来与侧边栏相同
     generateRoutes(routes, basePath = '/') {
       const res = []
-
       for (let route of routes) {
         // 是否在前端进行隐藏
         if (route.hidden) { continue }
@@ -182,7 +205,6 @@ export default {
       return res
     },
 
-    // 参考：src/layout/components/Sidebar/SidebarItem.vue
     onlyOneShowingChild(children = [], parent) {
       let onlyOneChild = null
       // 如果没有子路由，就会返回 []
@@ -225,12 +247,16 @@ export default {
 
       // this.$nextTick(()=>{}) 将回调函数中的操作放到下一次DOM更新之后执行
       this.$nextTick(() => {
+        this.listLoading = true
         // 获取只存在该行角色的路由
         getRoutesByRole({ role: this.role.group_name }).then((response) => {
           const routes = this.generateArr(this.generateRoutes(response.data))
           this.$refs.tree.setCheckedNodes(routes)
           // 设置节点的已检查状态不会影响其父节点和子节点
           // this.checkStrictly = false
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       })
     },
@@ -263,14 +289,20 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         deleteRole({ 'role_id': row.business_id, 'group_name': row.group_name }).then(() => {
           this.rolesList.splice($index, 1)
+          // 关闭加载框
+          this.listLoading = false
+
           this.$notify({
             title: '删除角色：' + row.group_name,
             message: '删除成功！',
             type: 'success',
             duration: 2000
           })
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -308,4 +340,15 @@ export default {
     margin-bottom: 30px;
   }
 }
-</style> -->
+
+/* 移动端的适配 */
+@media screen and (max-width: 500px) {
+  .el-dialog {
+    width: 90% !important;
+  }
+
+  .el-form-item__content {
+    margin: 0 !important;
+  }
+}
+</style>

@@ -2,14 +2,15 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-02 11:34:51
+ * @LastEditTime: 2023-03-15 00:37:40
  * @FilePath: /order_system_vue/src/views/permission/role.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="handleAddRole">新增菜单</el-button>
+    <el-button type="primary" icon="el-icon-edit" @click="handleAddRole">新增菜单</el-button>
 
+    <!-- 表格数据 -->
     <el-table v-loading="listLoading" :data="apiList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="API名字">
         <template slot-scope="{row}">
@@ -271,8 +272,10 @@ export default {
       getMenu(this.query).then((response) => {
         this.apiList = response.data.data
         this.total = response.data.count
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 下拉选择是否隐藏
@@ -286,8 +289,10 @@ export default {
       this.listLoading = true
       getParentMenu().then((response) => {
         this.parent_menu_type_options = response.data.data
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 获取所有的api权限列表
@@ -295,8 +300,10 @@ export default {
       this.listLoading = true
       getAllPermission().then((response) => {
         this.api_permission_options = response.data.data
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 点击新增菜单
@@ -327,6 +334,7 @@ export default {
     addMenu() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           addMenu(this.temp).then(() => {
             // 前端新增一条菜单
             this.apiList.unshift(this.temp)
@@ -338,9 +346,12 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.listLoading = false
 
             // 刷新表格数据
             this.get_menu()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -350,6 +361,7 @@ export default {
     updateMenu() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           updateMenu(this.temp).then(() => {
             this.dialogVisible = false
 
@@ -360,8 +372,12 @@ export default {
               duration: 2000
             })
 
+            this.listLoading = false
+
             // 刷新表格数据
             this.get_menu()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -388,6 +404,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         deleteMenu({ 'business_id': row.business_id }).then(() => {
           this.$notify({
             title: '删除菜单：' + row.title,
@@ -396,6 +413,9 @@ export default {
             duration: 2000
           })
           this.apiList.splice(index, 1)
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -407,3 +427,16 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+  }
+</style>

@@ -46,22 +46,22 @@
             <el-form-item label="商品名称">
               <span>{{ props.row.product_name }}</span>
             </el-form-item>
-            <el-form-item label="规格（ML）">
+            <el-form-item label="产品规格（ML）">
               <span>{{ props.row.specifications }}</span>
             </el-form-item>
-            <el-form-item label="香型">
+            <el-form-item label="产品香型">
               <span>{{ props.row.scent_type }}</span>
             </el-form-item>
             <el-form-item label="每件规格（瓶）">
               <span>{{ props.row.specification_of_piece }}</span>
             </el-form-item>
-            <el-form-item label="单价（瓶/元）">
+            <el-form-item label="产品单价（瓶/元）">
               <span>{{ props.row.unit_price }}</span>
             </el-form-item>
             <el-form-item label="每件价格（元）">
               <span>{{ props.row.price_of_piece }}</span>
             </el-form-item>
-            <el-form-item label="扫码价（元）">
+            <el-form-item label="产品扫码价（元）">
               <span>{{ props.row.scanning_price }}</span>
             </el-form-item>
             <el-form-item label="备注">
@@ -94,7 +94,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="单价（瓶/元）" sortable="custom" prop="unit_price" class-name="status-col">
+      <el-table-column label="产品单价（瓶/元）" sortable="custom" prop="unit_price" class-name="status-col">
         <template slot-scope="{row}">
           <span>{{ row.unit_price }}</span>
         </template>
@@ -106,7 +106,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="扫码价（元）" sortable="custom" prop="scanning_price" align="center">
+      <el-table-column label="产品扫码价（元）" sortable="custom" prop="scanning_price" align="center">
         <template slot-scope="{row}">
           <span>{{ row.scanning_price }}</span>
         </template>
@@ -160,35 +160,35 @@
 
     <!-- 编辑按钮弹出框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 500px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-width="155px" label-position="left">
         <el-form-item label="产品名称" prop="product_name">
-          <el-input v-model.trim="temp.product_name" />
+          <el-input v-model.trim="temp.product_name" placeholder="请输入产品名称" />
         </el-form-item>
 
-        <el-form-item label="规格（ML）" prop="specifications">
-          <el-input-number v-model.trim="temp.specifications" :controls="true" />
+        <el-form-item label="产品规格（ML）" prop="specifications">
+          <el-input-number v-model.trim="temp.specifications" :controls="true" placeholder="请输入产品规格（ML）" />
         </el-form-item>
 
         <el-form-item label="香型" prop="scent_type">
-          <el-select v-model.trim="temp.scent_type" class="filter-item" placeholder="请选择香型">
+          <el-select v-model.trim="temp.scent_type" class="filter-item" placeholder="请选择产品香型">
             <el-option v-for="item in scentTypeOptions" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="每件规格（瓶）" prop="specification_of_piece">
-          <el-input-number v-model.trim="temp.specification_of_piece" :controls="true" @input="calPiecePrice" />
+          <el-input-number v-model.trim="temp.specification_of_piece" :controls="true" placeholder="请输入每件规格（瓶）" @input="calPiecePrice" />
         </el-form-item>
 
-        <el-form-item label="单价（元/瓶）" prop="unit_price">
-          <el-input-number v-model.trim="temp.unit_price" :controls="true" :precision="2" @input="calPiecePrice" />
+        <el-form-item label="产品单价（元/瓶）" prop="unit_price">
+          <el-input-number v-model.trim="temp.unit_price" :controls="true" :precision="2" placeholder="请输入产品单价（元/瓶）" @input="calPiecePrice" />
         </el-form-item>
 
         <el-form-item label="每件价格（元）" prop="price_of_piece">
-          <el-input-number v-model.trim="temp.price_of_piece" disabled :controls="true" :precision="2" />
+          <el-input-number v-model.trim="temp.price_of_piece" disabled :controls="true" :precision="2" placeholder="每件价格（元）" />
         </el-form-item>
 
-        <el-form-item label="扫码价（元）" prop="scanning_price">
-          <el-input-number v-model.trim="temp.scanning_price" :controls="true" :precision="2" />
+        <el-form-item label="产品扫码价（元）" prop="scanning_price">
+          <el-input-number v-model.trim="temp.scanning_price" :controls="true" :precision="2" placeholder="请输入产品扫码价（元）" />
         </el-form-item>
 
         <el-form-item label="上传图片" prop="image">
@@ -225,49 +225,8 @@
   </div>
 </template>
 
-<style>
-  /* 产看详情的 style */
-  .demo-table-expand {
-    font-size: 0;
-  }
-  .demo-table-expand label {
-    width: 90px;
-    color: #99a9bf;
-  }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 50%;
-  }
-
-  /* 上传框的 style */
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-  }
-</style>
-
 <script>
-import { getProductList, getAllProduct, updateProduct, deleteProduct, product_multi_delete, addProduct, searchProduct } from '@/api/product'
+import { getAllProduct, updateProduct, deleteProduct, product_multi_delete, addProduct, searchProduct } from '@/api/product'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -333,7 +292,7 @@ export default {
         // trigger 还一个属性是 blur，失去焦点再验证
         scent_type: [{ required: true, msg: '请选择产品的香型', trigger: 'change' }],
         specification_of_piece: [{ required: true, msg: '请输入产品的每件规格（瓶）', validator: limitNumber, trigger: 'blur' }],
-        unit_price: [{ required: true, msg: '请输入单价（瓶/元）', validator: limitNumber, trigger: 'blur' }],
+        unit_price: [{ required: true, msg: '请输入产品单价（瓶/元）', validator: limitNumber, trigger: 'blur' }],
         price_of_piece: [{ required: true, msg: '请输入每件价格（元）', validator: limitNumber, trigger: 'blur' }]
       },
       downloadLoading: false
@@ -361,18 +320,18 @@ export default {
     // 处理下载 Excel 表格数据
     // TODO 增加 一些赠品的剔除
     handleDownload() {
-      this.downloadLoading = true
       this.$confirm('是否确认将【自己的货单表】导出为Excel表格？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.downloadLoading = true
         // 从后台获取所要下载的所有数据
         getAllProduct(this.listQuery).then((response) => {
           const res = response.data.data
 
           import('@/vendor/Export2Excel').then(excel => {
-            const tHeader = ['产品名称', '规格（ML）', '香型', '每件规格（瓶）', '单价（元/瓶）', '每件价格（元）', '扫码价（元）', '备注']
+            const tHeader = ['产品名称', '产品规格（ML）', '产品香型', '每件规格（瓶）', '产品单价（元/瓶）', '每件价格（元）', '产品扫码价（元）', '备注']
             const filterVal = ['product_name', 'specifications', 'scent_type', 'specification_of_piece', 'unit_price', 'price_of_piece', 'scanning_price', 'remarks']
             const data = this.formatJson(filterVal, res)
 
@@ -386,13 +345,14 @@ export default {
             })
           })
           this.downloadLoading = false
+        }).catch(() => {
+          this.downloadLoading = false
         })
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '操作已取消！'
         })
-        this.downloadLoading = false
       })
     },
     // 格式转换
@@ -472,6 +432,8 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          this.listLoading = true
+
           // 放需要删除的业务id，每一次都进行清除变量
           const business_ids = []
           this.list = this.list.filter(
@@ -492,6 +454,9 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.listLoading = false
+          }).catch(() => {
+            this.listLoading = false
           })
         }).catch(() => {
           this.$message({
@@ -500,11 +465,10 @@ export default {
           })
         })
       } catch (error) {
-        this.loading = false
         console.log('批量删除出错了：')
         console.log(error)
       } finally {
-        this.loading = false
+        this.listLoading = false
       }
     },
 
@@ -522,26 +486,16 @@ export default {
       this.selectionList = dataList
     },
 
-    // 获取表格数据
-    getList() {
-      this.listLoading = true
-
-      getProductList(this.listQuery).then(response => {
-        this.list = response.data.data
-        this.total = response.data.count
-
-        this.listLoading = false
-      })
-    },
-
     // 搜索功能
     handleFilter() {
       this.listLoading = true
       searchProduct(this.listQuery).then(response => {
         this.list = response.data.data
         this.total = response.data.count
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 生成时间戳，用来更新创建框的缓存
@@ -565,6 +519,7 @@ export default {
     addData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           const formData = new FormData()
           if (this.fileList.length !== 0) {
             formData.append('pictureFile', this.fileList[0].raw)
@@ -584,8 +539,12 @@ export default {
             // 重新清空一下 upload 图片的变量
             this.temp.image = ''
             this.fileList = []
+
+            this.listLoading = false
             // 刷新表格数据
             this.handleFilter()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -595,6 +554,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           if (this.fileList.length !== 0) {
             const formData = new FormData()
             formData.append('pictureFile', this.fileList[0].raw)
@@ -614,9 +574,12 @@ export default {
             // 重新清空一下 upload 图片的变量
             this.temp.image = ''
             this.fileList = []
+            this.listLoading = false
 
             // 刷新表格数据
             this.handleFilter()
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -649,6 +612,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         deleteProduct(row).then(() => {
           this.dialogFormVisible = false
           this.$notify({
@@ -658,6 +622,9 @@ export default {
             duration: 2000
           })
           this.list.splice(index, 1)
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -669,3 +636,63 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+
+    .el-message-box{
+      width: 60% !important;
+    }
+
+    .el-message {
+      min-width: 300px !important;
+    }
+  }
+
+  /* 产看详情的 style */
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 90px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
+  }
+
+  /* 上传框的 style */
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div v-loading="listLoading" :class="className" :style="{height:height,width:width}" />
 </template>
 
 <script>
@@ -27,6 +27,7 @@ export default {
 
   data() {
     return {
+      listLoading: true,
       chart: null,
       keys: [],
       values: []
@@ -44,10 +45,11 @@ export default {
     this.chart.dispose()
     this.chart = null
   },
+
   methods: {
     get_outbound_bar_statistics() {
+      this.listLoading = true
       getOutboundBarStatistics().then((response) => {
-
         this.keys = response.data.keys
         const values = response.data.values
 
@@ -68,6 +70,10 @@ export default {
         this.$nextTick(() => {
           this.initChart()
         })
+
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
 
@@ -75,7 +81,7 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
       this.chart.setOption({
         title: {
-          text: '各个产品的经销商销售情况统计图（瓶）：',
+          text: '各产品的经销商销售统计图（瓶）：',
           textStyle: {
             fontSize: 18,
             fontWeight: 'bolder'

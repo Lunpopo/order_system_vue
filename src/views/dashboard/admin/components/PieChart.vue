@@ -1,13 +1,5 @@
-<!--
- * @Author: xie.yx yxxie@gk-estor.com
- * @Date: 2022-12-05 21:09:43
- * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-01-14 16:13:54
- * @FilePath: /vue-element-admin/src/views/dashboard/admin/components/PieChart.vue
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div v-loading="listLoading" :class="className" :style="{height:height,width:width}" />
 </template>
 
 <script>
@@ -35,6 +27,7 @@ export default {
 
   data() {
     return {
+      listLoading: true,
       // 经销商列表
       dealer_names: [],
       // 经销商数据列表，里面是字典
@@ -47,12 +40,6 @@ export default {
     this.get_outbound_pie_data()
   },
 
-  mounted() {
-    this.$nextTick(() => {
-      this.initChart()
-    })
-  },
-
   beforeDestroy() {
     if (!this.chart) {
       return
@@ -62,9 +49,25 @@ export default {
   },
 
   methods: {
+    // 获取各个经销商出库金额的饼图统计信息
+    get_outbound_pie_data() {
+      this.listLoading = true
+      getOutboundPieStatistics().then((response) => {
+        // 然后再给饼状图赋值
+        this.dealer_names = response.data.dealer_names
+        this.dealer_price_data = response.data.data_dict
+
+        this.$nextTick(() => {
+          this.initChart()
+        })
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
+      })
+    },
+
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-
       this.chart.setOption({
         title: {
           text: '前5名经销商进货额统计信息：',
@@ -80,7 +83,7 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: []
+          data: this.dealer_names
         },
         series: [
           {
@@ -90,29 +93,11 @@ export default {
             // radius: [15, 95],
             radius: [30, 130],
             // center: ['50%', '38%'],
-            data: [],
+            data: this.dealer_price_data,
             animationEasing: 'cubicInOut',
             animationDuration: 2600
           }
         ]
-      })
-    },
-
-    // 获取各个经销商出库金额的饼图统计信息
-    get_outbound_pie_data() {
-      getOutboundPieStatistics().then((response) => {
-        this.dealer_names = response.data.dealer_names
-        this.dealer_price_data = response.data.data_dict
-
-        // 然后再给饼状图赋值
-        this.chart.setOption({
-          legend: {
-            data: this.dealer_names
-          },
-          series: [{
-            data: this.dealer_price_data
-          }]
-        })
       })
     }
   }

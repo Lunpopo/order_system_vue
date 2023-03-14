@@ -88,8 +88,8 @@ export default {
           }
         },
         grid: {
-          left: 10,
-          right: 10,
+          left: 1,
+          right: 1,
           bottom: 20,
           top: 50,
           containLabel: true
@@ -106,10 +106,11 @@ export default {
             show: false
           }
         },
-        legend: {
-          // data: ['expected', 'actual']
-          data: [switch_name]
-        },
+        // 是否打开控制按钮开关
+        // legend: {
+        //   // data: ['expected', 'actual']
+        //   data: [switch_name]
+        // },
         series: [{
           name: switch_name,
           smooth: true,

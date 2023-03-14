@@ -28,7 +28,6 @@
           <div class="card-panel-text">
             （件）
           </div>
-          <!-- <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" /> -->
         </div>
       </div>
     </el-col>
@@ -45,7 +44,6 @@
           <div class="card-panel-text">
             （元）
           </div>
-          <!-- <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" /> -->
         </div>
       </div>
     </el-col>
@@ -62,7 +60,6 @@
           <div class="card-panel-text">
             （瓶）
           </div>
-          <!-- <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" /> -->
         </div>
       </div>
     </el-col>

@@ -2,7 +2,7 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2023-02-25 16:23:05
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-03 15:38:41
+ * @LastEditTime: 2023-03-14 20:37:53
  * @FilePath: /order_system_vue/src/permission.js
  * @Description:
  */
@@ -57,14 +57,13 @@ router.beforeEach(async(to, from, next) => {
           // 获取用户信息失败！
           // 删除 token 并转到登录页面重新登录
           await store.dispatch('user/resetToken')
-          // Message.warning('登录信息过期，请重新登录！')
-          next(`/login?redirect=${to.path}`)
+          // next(`/login?redirect=${to.path}`)
           NProgress.done()
         }
       }
     }
   } else {
-    /* has no token*/
+    // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
       next()

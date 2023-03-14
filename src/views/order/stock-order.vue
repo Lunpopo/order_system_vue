@@ -122,7 +122,7 @@
         <!-- 表格数据 -->
         <el-table
           :key="purchaseTableKey"
-          v-loading="listLoading"
+          v-loading="purchaseListLoading"
           :data="purchase_list"
           border
           fit
@@ -220,7 +220,7 @@
         <!-- 表格数据 -->
         <el-table
           :key="outboundTableKey"
-          v-loading="listLoading"
+          v-loading="outboundListLoading"
           :data="outbound_list"
           border
           fit
@@ -303,22 +303,6 @@
   </div>
 </template>
 
-<style>
-  /* 产看详情的 style */
-  .demo-table-expand {
-    font-size: 0;
-  }
-  .demo-table-expand label {
-    width: 90px;
-    color: #99a9bf;
-  }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 50%;
-  }
-</style>
-
 <script>
 import { getStockDataList, getPurchaseStockDataList, getOutboundStockDataList, getStockAllData, getPurchaseStockAllData, getOutboundStockAllData } from '@/api/stock_order'
 import waves from '@/directive/waves' // waves directive
@@ -331,6 +315,8 @@ export default {
   directives: { waves },
   data() {
     return {
+      // 产品入库加载
+      purchaseListLoading: true,
       // 搜索名称
       searchTitle: '',
       activeName: 0,
@@ -516,30 +502,36 @@ export default {
       getStockDataList(this.listQuery).then(response => {
         this.total_list = response.data.data
         this.total_count = response.data.count
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
-      this.listLoading = false
     },
 
     // 获取入库数量数据
     getPurchaseList() {
-      this.listLoading = true
+      this.purchaseListLoading = true
       this.purchaseListQuery.title = this.searchTitle
       getPurchaseStockDataList(this.purchaseListQuery).then(response => {
         this.purchase_list = response.data.data
         this.purchase_count = response.data.count
+        this.purchaseListLoading = false
+      }).catch(() => {
+        this.purchaseListLoading = false
       })
-      this.listLoading = false
     },
 
     // 获取出库数量数据
     getOutboundList() {
-      this.listLoading = true
+      this.outboundListLoading = true
       this.outboundListQuery.title = this.searchTitle
       getOutboundStockDataList(this.outboundListQuery).then(response => {
         this.outbound_list = response.data.data
         this.outbound_count = response.data.count
+        this.outboundListLoading = false
+      }).catch(() => {
+        this.outboundListLoading = false
       })
-      this.listLoading = false
     },
 
     // 搜索功能
@@ -558,3 +550,29 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* 产看详情的 style */
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 90px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
+  }
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+  }
+</style>

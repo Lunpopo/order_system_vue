@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-02-15 11:36:18
+ * @LastEditTime: 2023-03-15 00:27:04
  * @FilePath: /vue-element-admin/src/views/tab/order.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -15,8 +15,8 @@
     </el-select>
 
     <!-- 展示出库信息卡片 -->
-    <el-row>
-      <el-col v-for="(domain, index) in temp" :key="domain.id" :span="10" :offset="1" style="margin-top: 20px">
+    <el-row v-loading="cardListLoading">
+      <el-col v-for="(domain, index) in temp" :key="domain.id" :xs="22" :sm="22" :lg="10" :offset="1" style="margin-top: 20px">
         <el-card :body-style="{ padding: '0px' }">
           <div style="padding: 14px;">
             <!-- 本次出库的标题 -->
@@ -41,7 +41,7 @@
     </el-row>
 
     <!-- 查看详情页面弹出框 -->
-    <el-dialog :title="textMap[dialogStatus]" width="60%" :visible.sync="viewDetail">
+    <el-dialog :title="textMap[dialogStatus]" width="80%" :visible.sync="viewDetail">
       <el-descriptions title="客户信息">
         <el-descriptions-item label="电话">
           <el-tag v-if="outbound_phone !== null" size="small">{{ outbound_phone }}</el-tag>
@@ -67,6 +67,7 @@
         导出本次出库单
       </el-button>
       <el-table
+        v-loading="detailsListLoading"
         :data="currentProduct"
         border
         style="width: 100%"
@@ -251,6 +252,7 @@
 
         <el-divider />
         <el-table
+          v-loading="embeddedListLoading"
           :data="productList"
           border
           style="width: 100%"
@@ -301,9 +303,9 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="数量（瓶）" min-width="170px" prod="quantity">
+          <el-table-column label="数量（瓶）" min-width="210px" prod="quantity">
             <template slot-scope="{row, $index}">
-              <el-input-number v-model.trim="row.quantity" :value="row.quantity" :controls="true" placeholder="请输入产品数量" @change="calProductPrice(row, $index)" />
+              <el-input-number v-model.trim="row.quantity" :value="row.quantity" :controls="true" controls-position="right" size="medium" placeholder="请输入产品数量" @change="calProductPrice(row, $index)" />
             </template>
           </el-table-column>
         </el-table>
@@ -332,40 +334,6 @@
     </el-dialog>
   </div>
 </template>
-
-<style>
-  /* 超出的内容文字隐藏（变成...） */
-  .designer-inner-info_width{
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .bottom {
-    margin-top: 8px;
-    /* line-height: 12px; */
-  }
-
-  .button {
-    padding: 0;
-    float: right;
-  }
-
-  .image {
-    width: 100%;
-    display: block;
-  }
-
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-
-  .clearfix:after {
-      clear: both
-  }
-</style>
 
 <script>
 import { addOutboundOrder, getOutboundOrder, getOutboundProductDetails, delOutboundOrder } from '@/api/outbound_order'
@@ -396,6 +364,12 @@ export default {
       }
     }
     return {
+      // 内嵌产品搜索加载框
+      embeddedListLoading: true,
+      // 加载详情的圈圈
+      detailsListLoading: true,
+      // 卡片的加载圈圈
+      cardListLoading: true,
       // 点击查看详情展示的电话
       outbound_phone: 0,
       outbound_address: 0,
@@ -615,12 +589,14 @@ export default {
       this.innerVisible = true
 
       // 获取所有的产品
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchDealerProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.embeddedListLoading = false
       })
-      this.listLoading = false
     },
 
     // 获取经销商的下拉框数据
@@ -696,12 +672,14 @@ export default {
     // 搜索功能
     handleFilter() {
       // 获取所有的产品
-      this.listLoading = true
+      this.embeddedListLoading = true
       searchDealerProduct(this.productListQuery).then(response => {
         this.productList = response.data.data
         this.productTotal = response.data.count
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.embeddedListLoading = false
       })
-      this.listLoading = false
     },
 
     // 更改数量之后立马更新 行内的 小计金额 和 外面的总计金额 和 总瓶数
@@ -770,6 +748,8 @@ export default {
 
     // 点击查看详情
     handleDetails(business_id, index) {
+      this.detailsListLoading = true
+
       this.dialogStatus = 'detail'
       this.viewDetail = true
       this.outbound_order_index = index
@@ -783,10 +763,13 @@ export default {
       }
       getOutboundProductDetails(params).then((response) => {
         this.currentProduct = response.data.data
+        this.detailsListLoading = false
+      }).catch(() => {
+        this.detailsListLoading = false
       })
     },
 
-    // 点击要删除此产品
+    // 内嵌产品表格点击要删除此产品
     handleDeleteProduct(index) {
       this.$confirm('是否确认删除此条产品数据？', '提示', {
         confirmButtonText: '确定',
@@ -804,7 +787,7 @@ export default {
       })
     },
 
-    // 点击删除按钮
+    // 点击删除卡片按钮
     handleDelete(obj, index) {
       const business_id = obj.business_id
       const title = obj.title
@@ -814,6 +797,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.listLoading = true
         const params = {
           'outbound_order_id': business_id
         }
@@ -826,6 +810,9 @@ export default {
             duration: 2000
           })
           this.temp.splice(index, 1)
+          this.listLoading = false
+        }).catch(() => {
+          this.listLoading = false
         })
       }).catch(() => {
         this.$message({
@@ -839,6 +826,7 @@ export default {
     addData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           const deleteZeroProduct = []
           this.saveOutboundProduct.forEach(element => {
             if (element.quantity !== 0) {
@@ -858,9 +846,12 @@ export default {
             this.temp = []
             this.dynamicValidateForm = {}
             this.getData()
+            this.listLoading = false
 
             // 关闭弹出框
             this.dialogFormVisible = false
+          }).catch(() => {
+            this.listLoading = false
           })
         }
       })
@@ -868,10 +859,14 @@ export default {
 
     // 获取出库单数据
     getData() {
+      this.cardListLoading = true
       // 发送到后台，添加该次出库单
       getOutboundOrder(this.listQuery).then((response) => {
         this.temp = response.data.data
         this.total = response.data.count
+        this.cardListLoading = false
+      }).catch(() => {
+        this.cardListLoading = false
       })
     },
 
@@ -904,3 +899,48 @@ export default {
   }
 }
 </script>
+
+<style>
+  /* 超出的内容文字隐藏（变成...） */
+  .designer-inner-info_width{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .bottom {
+    margin-top: 8px;
+    /* line-height: 12px; */
+  }
+
+  .button {
+    padding: 0;
+    float: right;
+  }
+
+  .image {
+    width: 100%;
+    display: block;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+      display: table;
+      content: "";
+  }
+
+  .clearfix:after {
+      clear: both
+  }
+
+  /* 移动端的适配 */
+  @media screen and (max-width: 500px) {
+    .el-dialog {
+      width: 90% !important;
+    }
+
+    .el-form-item__content {
+      margin: 0 !important;
+    }
+  }
+</style>

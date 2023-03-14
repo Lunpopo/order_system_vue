@@ -2,7 +2,7 @@
   <div class="dashboard-editor-container">
     <!-- 入库出库总金额和总数量统计 -->
     <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="40" class="panel-group">
-      <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <el-col v-loading="purchaseLoading" :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div>
           <el-statistic group-separator="," :precision="2" decimal-separator="." :value="purchase_order_total_price" title="入库单总金额">
             <template slot="prefix">
@@ -15,13 +15,13 @@
         </div>
       </el-col>
 
-      <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <el-col v-loading="purchaseLoading" :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div>
           <el-statistic :value="purchase_order_total_piece" title="入库单总数量（件）" />
         </div>
       </el-col>
 
-      <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <el-col v-loading="outboundLoading" :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div>
           <el-statistic group-separator="," :precision="2" decimal-separator="." :value="outbound_order_total_price" title="出库单总金额">
             <template slot="prefix">
@@ -34,44 +34,48 @@
         </div>
       </el-col>
 
-      <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <el-col v-loading="outboundLoading" :xs="12" :sm="12" :lg="6" class="card-panel-col">
         <div>
           <el-statistic :value="outbound_order_total_piece" title="出库单总数量（瓶）" />
         </div>
       </el-col>
     </el-row>
 
-    <!-- <github-corner class="github-corner" /> -->
-
     <panel-group v-if="checkPermission(['admin', 'data', 'test'])" @handleSetLineChartData="handleSetLineChartData" />
 
-    <el-row v-if="checkPermission(['admin', 'data', 'test'])" style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+    <el-row v-if="checkPermission(['admin', 'data', 'test'])" v-loading="listLoading" style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
     <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="32">
-      <!-- <el-col :xs="24" :sm="24" :lg="8"> -->
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <pie-chart :chart-data="lineChartData" />
+          <pie-chart />
+          <!-- <bar-chart /> -->
         </div>
       </el-col>
-      <!-- <el-col :xs="24" :sm="24" :lg="8"> -->
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <bar-chart />
         </div>
       </el-col>
     </el-row>
 
+    <!-- 每行总共24个栅格，在不同尺寸的页面上如何分配宽度比例：
+    xs	<768px	超小屏 如：手机
+    sm	≥768px	小屏幕 如：平板
+    md	≥992px	中等屏幕 如：桌面显示器
+    lg	≥1200px	大屏幕 如：大桌面显示器
+    xl	≥1920px	2k屏等 -->
     <el-row v-if="checkPermission(['admin', 'data', 'test'])" :gutter="32">
-      <!-- <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;"> -->
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" style="margin-bottom:30px;">
+        <!-- <el-col :span="12"> -->
         <div class="chart-wrapper">
           <transaction-table />
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" style="margin-bottom:30px;">
+        <!-- <el-col :span="12"> -->
         <div class="chart-wrapper">
           <product-transaction-table />
         </div>
@@ -127,6 +131,12 @@ export default {
 
   data() {
     return {
+      // 入库单总金额加载圈
+      purchaseLoading: true,
+      // 出库单总金额加载圈
+      outboundLoading: true,
+      // 加载圈圈
+      listLoading: true,
       // 默认展示的折线统计图
       lineChartData: choiceStatistic.purchase_price,
       purchase_order_total_price: '',
@@ -146,15 +156,26 @@ export default {
     checkPermission,
     // 获取入库单和出库单的总金额和总数量
     getTotalPurchaseOutbound() {
+      this.purchaseLoading = true
+      // 入库单总金额统计
       getTotalPurchasePriceAndPiece().then((response) => {
         const data = response.data
         this.purchase_order_total_price = data.total_price
         this.purchase_order_total_piece = data.total_piece
+        this.purchaseLoading = false
+      }).catch(() => {
+        this.purchaseLoading = false
       })
+
+      this.outboundLoading = true
+      // 出库单总金额统计
       getTotalOutboundPriceAndPiece().then((response) => {
         const data = response.data
         this.outbound_order_total_price = data.total_price
         this.outbound_order_total_piece = data.total_piece
+        this.outboundLoading = false
+      }).catch(() => {
+        this.outboundLoading = false
       })
     },
 
@@ -166,6 +187,7 @@ export default {
 
     // 获取入库单金额和时间的统计数据
     getPurchaseStatistic() {
+      this.listLoading = true
       getPurchasePriceStatistics().then((response) => {
         const _dict = {
           'data': response.data.y,
@@ -175,6 +197,9 @@ export default {
         }
         choiceStatistic.purchase_price = _dict
         this.lineChartData = _dict
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
       getPurchasePieceStatistics().then((response) => {
         const _dict = {
@@ -211,39 +236,34 @@ export default {
 
     // 点击按钮 切换统计图
     handleSetLineChartData(type) {
+      this.listLoading = true
       this.lineChartData = choiceStatistic[type]
+      this.listLoading = false
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.card-panel-col {
-  margin-bottom: 32px;
-}
-
-.dashboard-editor-container {
-  padding: 32px;
-  background-color: rgb(240, 242, 245);
-  position: relative;
-
-  // .github-corner {
-  //   position: absolute;
-  //   top: 0px;
-  //   border: 0;
-  //   right: 0;
-  // }
-
-  .chart-wrapper {
-    background: #fff;
-    padding: 16px 16px 0;
-    margin-bottom: 16px;
+  .card-panel-col {
+    margin-bottom: 32px;
   }
-}
 
-@media (max-width:1024px) {
-  .chart-wrapper {
-    padding: 8px;
+  .dashboard-editor-container {
+    padding: 32px;
+    background-color: rgb(240, 242, 245);
+    position: relative;
+
+    .chart-wrapper {
+      background: #fff;
+      padding: 16px 16px 0;
+      margin-bottom: 16px;
+    }
   }
-}
+
+  @media (max-width:1024px) {
+    .chart-wrapper {
+      padding: 8px;
+    }
+  }
 </style>
