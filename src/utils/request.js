@@ -2,7 +2,7 @@
  * @Author: lunpopo lunpopo.personal@gmail.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-14 17:01:35
+ * @LastEditTime: 2023-03-22 21:38:17
  * @FilePath: /vue-element-admin/src/utils/request.js
  * @Description: axios请求拦截器
  */
@@ -81,7 +81,7 @@ service.interceptors.response.use(
       const res = error.response
       if (res.status === 401) {
         console.log('401了，兄弟，你没有权限访问该页面（功能）！')
-        // TODO 如果又是 401 然后 token又过期了，就直接跳到login页面
+        // 如果又是 401 然后 token又过期了，就直接跳到login页面
         router.push({ name: 'Page401' })
       } else if (res.status === 500) {
         // 服务器内部报错

@@ -1,3 +1,11 @@
+<!--
+ * @Author: xie.yx yxxie@gk-estor.com
+ * @Date: 2023-02-28 17:17:55
+ * @LastEditors: xie.yx yxxie@gk-estor.com
+ * @LastEditTime: 2023-03-22 21:37:58
+ * @FilePath: /order_system_vue/src/layout/components/Sidebar/SidebarItem.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <div v-if="!item.hidden">
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
@@ -51,8 +59,6 @@ export default {
     }
   },
   data() {
-    // To fix https://github.com/PanJiaChen/vue-admin-template/issues/237
-    // TODO: refactor with render function
     this.onlyOneChild = null
     return {}
   },

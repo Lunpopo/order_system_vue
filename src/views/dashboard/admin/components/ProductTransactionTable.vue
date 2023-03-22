@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2023-02-27 09:30:06
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-13 23:15:16
+ * @LastEditTime: 2023-03-22 21:55:27
  * @FilePath: /order_system_vue/src/views/dashboard/admin/components/TransactionTable.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -89,7 +89,6 @@ export default {
       productTransactionList().then(response => {
         // this.list = response.data.items.slice(0, 8)
         this.list = response.data.items
-        // console.log(this.list)
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false

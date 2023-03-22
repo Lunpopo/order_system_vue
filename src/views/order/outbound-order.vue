@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-15 00:27:04
+ * @LastEditTime: 2023-03-22 21:54:34
  * @FilePath: /vue-element-admin/src/views/tab/order.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -45,12 +45,12 @@
       <el-descriptions title="客户信息">
         <el-descriptions-item label="电话">
           <el-tag v-if="outbound_phone !== null" size="small">{{ outbound_phone }}</el-tag>
-          <el-button v-if="outbound_phone !== null" size="mini" type="primary" round icon="el-icon-document" @click.stop="_copy(outbound_phone)">复制</el-button>
+          <el-button v-if="outbound_phone !== null" size="mini" style="margin-left: 5px;" type="primary" round icon="el-icon-document" @click.stop="_copy(outbound_phone)">复制</el-button>
         </el-descriptions-item>
 
         <el-descriptions-item label="地址">
           <span>{{ outbound_address }}</span>
-          <el-button size="mini" type="primary" round icon="el-icon-document" @click.stop="_copy(outbound_address)">复制</el-button>
+          <el-button size="mini" type="primary" style="margin-left: 5px;" round icon="el-icon-document" @click.stop="_copy(outbound_address)">复制</el-button>
         </el-descriptions-item>
 
         <el-descriptions-item label="物流公司">{{ outbound_logistics_company }}</el-descriptions-item>
@@ -59,7 +59,7 @@
           <el-tag v-if="outbound_logistics_num !== null" type="warning" size="small">
             {{ outbound_logistics_num }}
           </el-tag>
-          <el-button size="mini" type="primary" round icon="el-icon-document" @click.stop="_copy(outbound_logistics_num)">复制</el-button>
+          <el-button size="mini" type="primary" style="margin-left: 5px;" round icon="el-icon-document" @click.stop="_copy(outbound_logistics_num)">复制</el-button>
         </el-descriptions-item>
       </el-descriptions>
       <el-divider />
@@ -935,12 +935,17 @@ export default {
 
   /* 移动端的适配 */
   @media screen and (max-width: 500px) {
+    /* 手机端的form表单适配 */
     .el-dialog {
       width: 90% !important;
     }
-
     .el-form-item__content {
       margin: 0 !important;
+    }
+
+    /* .el-descriptions的适配 */
+    .el-descriptions-item {
+      float: left !important;
     }
   }
 </style>

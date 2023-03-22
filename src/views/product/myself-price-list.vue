@@ -318,7 +318,6 @@ export default {
     },
 
     // 处理下载 Excel 表格数据
-    // TODO 增加 一些赠品的剔除
     handleDownload() {
       this.$confirm('是否确认将【自己的货单表】导出为Excel表格？', '提示', {
         confirmButtonText: '确定',
