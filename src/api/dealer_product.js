@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-01-06 16:33:25
+ * @LastEditTime: 2023-03-29 16:02:10
  * @FilePath: /vue-admin-template/Users/popolun/test_folder/vue-element-admin/src/api/article.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -35,22 +35,20 @@ export function getDealerList() {
 }
 
 // 新增经销商产品
-export function addDealerProduct(params) {
+export function addDealerProduct(data) {
   return request({
     url: '/data/add_dealer_product',
     method: 'post',
-    params,
-    data: params.image
+    data
   })
 }
 
 // 更新经销商产品
-export function updateDealerProduct(params) {
+export function updateDealerProduct(data) {
   return request({
     url: '/data/update_dealer_product',
     method: 'post',
-    params,
-    data: params.image
+    data
   })
 }
 
