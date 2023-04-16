@@ -677,6 +677,7 @@ export default {
             duration: 2000
           })
           this.list.splice(index, 1)
+          this.listLoading = false
         }).catch(() => {
           this.listLoading = false
         })

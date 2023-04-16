@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-29 16:02:10
+ * @LastEditTime: 2023-04-12 17:16:37
  * @FilePath: /vue-admin-template/Users/popolun/test_folder/vue-element-admin/src/api/article.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -31,6 +31,42 @@ export function getDealerList() {
   return request({
     url: '/data/get_dealer_list',
     method: 'get'
+  })
+}
+
+// 搜索经销商的名单列表
+export function searchDealerList(query) {
+  return request({
+    url: '/data/search_dealer_list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 新增经销商名称
+export function addDealerName(data) {
+  return request({
+    url: '/data/add_dealer_name',
+    method: 'post',
+    data
+  })
+}
+
+// 更新经销商信息
+export function updateDealerInfo(data) {
+  return request({
+    url: '/data/update_dealer_info',
+    method: 'post',
+    data
+  })
+}
+
+// 删除经销商名称
+export function deleteDealerName(data) {
+  return request({
+    url: '/data/delete_dealer_name',
+    method: 'post',
+    data
   })
 }
 

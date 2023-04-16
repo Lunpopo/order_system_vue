@@ -40,6 +40,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
+import { MessageBox } from 'element-ui'
 
 export default {
   components: {
@@ -61,10 +62,15 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      MessageBox.confirm('您已登出，请重新登陆', '登录信息提示', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
       // const storage = window.localStorage
       // storage.clear
-      window.location.href = `/login?redirect=${this.$route.fullPath}`
+      // window.location.href = `/login?redirect=${this.$route.fullPath}`
     }
   }
 }
