@@ -26,41 +26,6 @@
           style="width: 100%;"
         >
 
-          <!-- 按下详情按钮 -->
-          <el-table-column label="详情" type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="商品 ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="商品名称">
-                  <span>{{ props.row.product_name }}</span>
-                </el-form-item>
-                <el-form-item label="规格（ML）">
-                  <span>{{ props.row.specifications }}</span>
-                </el-form-item>
-                <el-form-item label="香型">
-                  <span>{{ props.row.scent_type }}</span>
-                </el-form-item>
-                <el-form-item label="每件规格（瓶）">
-                  <span>{{ props.row.specification_of_piece }}</span>
-                </el-form-item>
-                <el-form-item label="入库数量（瓶）">
-                  <span>{{ props.row.purchase_quantity }}</span>
-                </el-form-item>
-                <el-form-item label="出库数量（瓶）">
-                  <span>{{ props.row.outbound_quantity }}</span>
-                </el-form-item>
-                <el-form-item label="剩余库存数量（瓶）">
-                  <span>{{ props.row.quantity }}</span>
-                </el-form-item>
-                <el-form-item label="业务id">
-                  <span>{{ props.row.business_id }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-
           <el-table-column label="产品名称" prop="product_name" min-width="100px">
             <template slot-scope="{row}">
               <span>{{ row.product_name }} </span>
@@ -130,41 +95,6 @@
           style="width: 100%;"
         >
 
-          <!-- 按下详情按钮 -->
-          <el-table-column label="详情" type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="商品 ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="商品名称">
-                  <span>{{ props.row.product_name }}</span>
-                </el-form-item>
-                <el-form-item label="规格（ML）">
-                  <span>{{ props.row.specifications }}</span>
-                </el-form-item>
-                <el-form-item label="香型">
-                  <span>{{ props.row.scent_type }}</span>
-                </el-form-item>
-                <el-form-item label="每件规格（瓶）">
-                  <span>{{ props.row.specification_of_piece }}</span>
-                </el-form-item>
-                <el-form-item label="单价（元）">
-                  <span>{{ props.row.unit_price }}</span>
-                </el-form-item>
-                <el-form-item label="入库数量（瓶）">
-                  <span>{{ props.row.quantity }}</span>
-                </el-form-item>
-                <el-form-item label="备注">
-                  <span>{{ props.row.remarks }}</span>
-                </el-form-item>
-                <el-form-item label="业务id">
-                  <span>{{ props.row.business_id }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-
           <el-table-column label="产品名称" prop="product_name" min-width="100px">
             <template slot-scope="{row}">
               <span>{{ row.product_name }} </span>
@@ -227,35 +157,6 @@
           highlight-current-row
           style="width: 100%;"
         >
-
-          <!-- 按下详情按钮 -->
-          <el-table-column label="详情" type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="商品 ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="商品名称">
-                  <span>{{ props.row.product_name }}</span>
-                </el-form-item>
-                <el-form-item label="规格（ML）">
-                  <span>{{ props.row.specifications }}</span>
-                </el-form-item>
-                <el-form-item label="香型">
-                  <span>{{ props.row.scent_type }}</span>
-                </el-form-item>
-                <el-form-item label="每件规格（瓶）">
-                  <span>{{ props.row.specification_of_piece }}</span>
-                </el-form-item>
-                <el-form-item label="出库数量（瓶）">
-                  <span>{{ props.row.quantity }}</span>
-                </el-form-item>
-                <el-form-item label="业务id">
-                  <span>{{ props.row.business_id }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
 
           <el-table-column label="产品名称" prop="product_name" min-width="100px">
             <template slot-scope="{row}">
@@ -553,7 +454,7 @@ export default {
 
 <style>
   /* 产看详情的 style */
-  .demo-table-expand {
+  /* .demo-table-expand {
     font-size: 0;
   }
   .demo-table-expand label {
@@ -564,7 +465,8 @@ export default {
     margin-right: 0;
     margin-bottom: 0;
     width: 50%;
-  }
+  } */
+
   /* 移动端的适配 */
   @media screen and (max-width: 500px) {
     .el-dialog {

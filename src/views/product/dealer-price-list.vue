@@ -36,59 +36,6 @@
     >
       <el-table-column type="selection" width="55" />
 
-      <!-- 按下详情按钮 -->
-      <el-table-column label="详情" type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="商品 ID">
-              <span>{{ props.row.id }}</span>
-            </el-form-item>
-            <el-form-item label="产品名称">
-              <span>{{ props.row.product_name }}</span>
-            </el-form-item>
-            <el-form-item label="产品归属经销商">
-              <span>{{ props.row.belong_to }}</span>
-            </el-form-item>
-            <el-form-item label="产品规格（ML）">
-              <span>{{ props.row.specifications }}</span>
-            </el-form-item>
-            <el-form-item label="产品香型">
-              <span>{{ props.row.scent_type }}</span>
-            </el-form-item>
-            <el-form-item label="每件规格（瓶）">
-              <span>{{ props.row.specification_of_piece }}</span>
-            </el-form-item>
-            <el-form-item label="产品出厂价（元/瓶）">
-              <span>{{ props.row.unit_price }}</span>
-            </el-form-item>
-            <el-form-item label="每件价格（元）">
-              <span>{{ props.row.price_of_piece }}</span>
-            </el-form-item>
-            <el-form-item label="产品批发价（元/瓶）">
-              <span>{{ props.row.wholesale_price }}</span>
-            </el-form-item>
-            <el-form-item label="建议零售价（元/瓶）">
-              <span>{{ props.row.suggested_retail_price }}</span>
-            </el-form-item>
-            <el-form-item label="产品扫码价（元/瓶）">
-              <span>{{ props.row.scanning_price }}</span>
-            </el-form-item>
-            <el-form-item label="备注">
-              <span>{{ props.row.remarks }}</span>
-            </el-form-item>
-            <el-form-item label="创建时间">
-              <span>{{ props.row.create_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-            </el-form-item>
-            <el-form-item label="更新时间">
-              <span>{{ props.row.update_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-            </el-form-item>
-            <el-form-item label="业务id">
-              <span>{{ props.row.business_id }}</span>
-            </el-form-item>
-          </el-form>
-        </template>
-      </el-table-column>
-
       <el-table-column label="产品名称" prop="product_name" sortable="custom" min-width="150px">
         <template slot-scope="{row}">
           <span class="link-type" @click="viewDetails(row)">{{ row.product_name }} </span>
@@ -191,7 +138,7 @@
 
         <el-form-item label="产品名称" prop="product_name">
           <el-input v-model.trim="temp.product_name" style="width: auto; float: left;" disabled placeholder="请选择基准产品" />
-          <el-button type="primary" style="float: left;" :disabled="temp.belong_to === undefined || temp.belong_to === ''" @click="select_product">点击选择产品</el-button>
+          <el-button v-if="dialogStatus==='create'" type="primary" style="float: left;" :disabled="temp.belong_to === undefined || temp.belong_to === ''" @click="select_product">点击选择产品</el-button>
         </el-form-item>
 
         <el-form-item label="产品规格（ML）" prop="specifications">
@@ -769,7 +716,7 @@ export default {
 
 <style>
   /* 产看详情的 style */
-  .demo-table-expand {
+  /* .demo-table-expand {
     font-size: 0;
   }
   .demo-table-expand label {
@@ -780,7 +727,7 @@ export default {
     margin-right: 0;
     margin-bottom: 0;
     width: 50%;
-  }
+  } */
 
   /* 移动端的适配 */
   @media screen and (max-width: 500px) {
