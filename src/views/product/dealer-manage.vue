@@ -7,9 +7,9 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-checkbox v-model.trim="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
+      <!-- <el-checkbox v-model.trim="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         显示隐藏列
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
 
     <!-- 添加 和 多行删除 按钮 -->
@@ -81,13 +81,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="showReviewer" label="创建时间" sortable="custom" prop="create_time" width="150px" align="center">
+      <el-table-column label="创建时间" sortable="custom" prop="create_time" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.create_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column v-if="showReviewer" label="更新时间" sortable="custom" prop="update_time" width="150px" align="center">
+      <el-table-column label="更新时间" sortable="custom" prop="update_time" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.update_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>

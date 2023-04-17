@@ -9,9 +9,9 @@
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出表格数据
       </el-button>
-      <el-checkbox v-model.trim="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
+      <!-- <el-checkbox v-model.trim="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         显示隐藏列
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
 
     <!-- 添加 和 多行删除 按钮 -->
