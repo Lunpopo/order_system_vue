@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-15 00:31:37
+ * @LastEditTime: 2023-06-28 11:57:30
  * @FilePath: /vue-element-admin/src/views/tab/order.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -17,9 +17,10 @@
             <!-- 本次入库的标题 -->
             <span style="font-size: 17px;font-weight: 800;"><i class="el-icon-document" />入库抬头：{{ domain.title }}</span>
             <el-button type="text" class="button" @click="handleDetails(domain.business_id)">查看详情<i class="el-icon-view el-icon--right" /></el-button>
-
+            <el-button type="text" class="button" style="margin-right: 15px;" @click="handleUpdate(domain, index)">编辑<i class="el-icon-edit el-icon--right" /></el-button>
             <el-divider />
-            <div class="bottom clearfix">本次入库时间：{{ domain.create_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="bottom clearfix">本次订单入库时间：{{ domain.create_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="bottom clearfix">本次订单更新时间：{{ domain.update_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
             <div class="bottom clearfix">本次入库产品种类：<el-tag size="small" type="success">{{ domain.type }}</el-tag></div>
             <div class="bottom clearfix">本次入库总数量（件）：{{ domain.total_piece }}</div>
             <div class="bottom clearfix">本次入库总金额（元）：{{ domain.total_price }}</div>
@@ -96,18 +97,23 @@
 
     <!-- 添加 按钮弹出框 -->
     <el-dialog :title="textMap[dialogStatus]" width="60%" :visible.sync="dialogFormVisible" @close="cancelAddOrder">
-      <el-form ref="dataForm" :rules="rules" :model="dynamicValidateForm" label-width="155px" label-position="left">
+      <el-form ref="dataForm" :rules="rules" :model="dynamicValidateForm" label-width="120px" label-position="right">
         <el-form-item prop="title" label="入库单标题：">
           <el-input v-model.trim="dynamicValidateForm.title" />
         </el-form-item>
 
+        <el-form-item v-if="dialogStatus == 'update'" label-width="120px" prop="create_time" label="入库时间：">
+          <el-date-picker v-model.trim="dynamicValidateForm.create_time" type="datetime" value-format="timestamp" placeholder="选择日期时间" />
+        </el-form-item>
+
         <el-form-item label="入库产品列表：" prop="product_list">
           <el-table
+            v-loading="detailsListLoading"
             :data="savePurchaseProduct"
             border
             style="width: 100%"
           >
-            <el-table-column label="产品名称" prod="product_name" min-width="150px">
+            <el-table-column label="产品名称" prod="product_name" min-width="200px">
               <template slot-scope="{row}">
                 <span>{{ row.product_name }} </span>
                 <el-tag>{{ row.scent_type }}</el-tag>
@@ -166,7 +172,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-button type="primary" @click="innerVisible = true">点击添加入库产品</el-button>
+          <el-button type="primary" @click="addPurchaseProduct">点击添加入库产品</el-button>
         </el-form-item>
 
         <el-form-item label="合计（元）：" prop="total_price">
@@ -277,7 +283,7 @@
 </template>
 
 <script>
-import { addPurchaseOrder, getPurchaseOrder, getPurchaseProductDetails, delPurchaseOrder } from '@/api/purchase_order'
+import { addPurchaseOrder, updatePurchaseOrder, getPurchaseOrder, getPurchaseProductDetails, delPurchaseOrder } from '@/api/purchase_order'
 import { searchProduct } from '@/api/product'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -304,6 +310,8 @@ export default {
       }
     }
     return {
+      // 点击查看详情的产品表格的加载圈圈
+      detailsListLoading: true,
       // 内嵌搜索加载圈圈
       embeddedListLoading: true,
       cardListLoading: true,
@@ -350,7 +358,7 @@ export default {
       dialogStatus: '',
       textMap: {
         detail: '本次入库详情信息',
-        update: '编辑产品',
+        update: '更新本次入库信息',
         create: '添加本次入库单产品'
       },
       // 表单验证规则
@@ -377,12 +385,6 @@ export default {
   },
 
   methods: {
-    click_add_purchase_product() {
-      // 页面更新数据，得先删除这个属性，再进行赋值
-      this.$delete(this.dynamicValidateForm, 'title')
-      this.$set(this.dynamicValidateForm.title, this.getTime() + '日入库')
-    },
-
     // 获取当前日期的函数：2023-2-14
     getTime() {
       const yy = new Date().getFullYear()
@@ -401,6 +403,43 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
       this.dynamicValidateForm = {}
+    },
+
+    // 点击添加入库产品按钮
+    addPurchaseProduct() {
+      this.innerVisible = true
+      this.embeddedListLoading = true
+
+      // 获取所有产品
+      searchProduct(this.productListQuery).then(response => {
+        // 用临时变量暂时保存检索的产品
+        const temp_productList = response.data.data
+        // 将临时保存的产品的数量弄到搜索框里面去
+        this.savePurchaseProduct.forEach(element1 => {
+          temp_productList.forEach((element2, index) => {
+            if (element1.product_name === element2.product_name && element1.scent_type === element2.scent_type && element1.specifications === element2.specifications) {
+              temp_productList[index].quantity = element1.quantity
+              if (temp_productList[index].quantity !== undefined) {
+                let subtotal_price = 0
+                subtotal_price = temp_productList[index].specification_of_piece * temp_productList[index].unit_price * temp_productList[index].quantity
+                if (subtotal_price >= 0) {
+                  temp_productList[index].subtotal_price = parseFloat(subtotal_price).toFixed(2)
+                } else {
+                  temp_productList[index].subtotal_price = undefined
+                }
+              } else {
+                temp_productList[index].subtotal_price = undefined
+              }
+            }
+          })
+        })
+        // 覆盖临时变量
+        this.productList = temp_productList
+        this.productTotal = response.data.count
+        this.embeddedListLoading = false
+      }).catch(() => {
+        this.embeddedListLoading = false
+      })
     },
 
     // 搜索功能
@@ -435,11 +474,11 @@ export default {
 
     // 计算小计的价格（单价 x 每件多少瓶 x 多少件）
     calPiecePrice() {
+      let total_price = 0.0 // 总金额
       let total_piece = 0 // 总数量
-      let total_price = 0 // 总金额
       this.savePurchaseProduct.forEach(element => {
-        total_price = total_price + element.subtotal_price
-        total_piece = total_piece + element.quantity
+        total_price = total_price + Number(element.subtotal_price)
+        total_piece = total_piece + Number(element.quantity)
       })
       this.dynamicValidateForm.total_price = total_price
       this.dynamicValidateForm.total_piece = total_piece
@@ -453,7 +492,7 @@ export default {
         if (subtotal_price >= 0) {
           // 页面更新数据，得先删除这个属性，再进行赋值
           this.$delete(this.productList[index], 'subtotal_price')
-          this.$set(this.productList[index], 'subtotal_price', subtotal_price)
+          this.$set(this.productList[index], 'subtotal_price', parseFloat(subtotal_price).toFixed(2))
         } else {
           this.$delete(this.productList[index], 'subtotal_price')
           this.$set(this.productList[index], 'subtotal_price', undefined)
@@ -469,18 +508,54 @@ export default {
       // 增加一个时间戳，用来前端更新弹出层用的
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      this.detailsListLoading = false
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
 
-      // 获取所有的产品
-      this.embeddedListLoading = true
-      searchProduct(this.productListQuery).then(response => {
-        this.productList = response.data.data
-        this.productTotal = response.data.count
-        this.embeddedListLoading = false
+      // 页面更新数据，得先删除这个属性，再进行赋值
+      this.$delete(this.dynamicValidateForm, 'title')
+      this.$set(this.dynamicValidateForm, 'title', this.getTime() + '日入库')
+    },
+
+    // 更新入库单卡片数据
+    handleUpdate(domain, index) {
+      this.detailsListLoading = true
+      const params = {
+        'purchase_order_id': domain.business_id
+      }
+      getPurchaseProductDetails(params).then((response) => {
+        this.savePurchaseProduct = response.data.data
+        // 更新价格
+        this.calPiecePrice()
+        this.detailsListLoading = false
       }).catch(() => {
-        this.embeddedListLoading = false
+        this.detailsListLoading = false
+      })
+
+      // 标题
+      // 页面更新数据，得先删除这个属性，再进行赋值
+      this.$delete(this.dynamicValidateForm, 'title')
+      this.$set(this.dynamicValidateForm, 'title', this.temp[index].title)
+      // 将内嵌的搜索框也要加进去
+      this.$delete(this.productListQuery, 'dealer_name')
+      this.$set(this.productListQuery, 'dealer_name', this.temp[index].belong_to)
+
+      // 备注
+      this.$delete(this.dynamicValidateForm, 'remarks')
+      this.$set(this.dynamicValidateForm, 'remarks', this.temp[index].remarks)
+      // 订单id
+      this.$delete(this.dynamicValidateForm, 'business_id')
+      this.$set(this.dynamicValidateForm, 'business_id', this.temp[index].business_id)
+
+      // 订单的创建时间
+      this.$delete(this.dynamicValidateForm, 'create_time')
+      this.$set(this.dynamicValidateForm, 'create_time', parseInt(this.temp[index].create_time) * 1000)
+
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
       })
     },
 
@@ -555,24 +630,34 @@ export default {
       })
     },
 
-    // 添加产品到本次入库订单
+    // 添加产品到本次入库订单的产品列表
     addProduct() {
       this.dynamicValidateForm.domains = []
       // 如果已存在一模一样的，就直接覆盖
       this.productList.forEach(element => {
         let is_same = false
-        if (element.quantity !== 0 && element.quantity !== undefined) {
-          this.savePurchaseProduct.forEach(element1 => {
-            if (element1.product_name === element.product_name && element1.scent_type === element.scent_type) {
-              is_same = true
-              return false
-            }
-          })
-          if (is_same === false) {
-            this.savePurchaseProduct.push(element)
+
+        this.savePurchaseProduct.forEach((element1, index) => {
+          if (element1.product_name === element.product_name && element1.scent_type === element.scent_type && element1.specifications === element.specifications) {
+            // 一样的就将数量进行覆盖
+            this.savePurchaseProduct[index].quantity = element.quantity
+            // 数量覆盖之后，行内价格也要进行覆盖
+            const subtotal_price = element.specification_of_piece * element.unit_price * element.quantity
+            this.savePurchaseProduct[index].subtotal_price = subtotal_price
+
+            is_same = true
+            return false // 跳出此次循环
           }
+        })
+        if (is_same === false) {
+          this.savePurchaseProduct.push(element)
         }
       })
+
+      // 删除数量为0的产品列表
+      const remove_zero_outbound_product = this.savePurchaseProduct.filter(item => item.quantity !== 0 && item.quantity !== undefined)
+      this.savePurchaseProduct = remove_zero_outbound_product
+
       // 调用计算 总计金额 和 总计数量 的函数
       this.calPiecePrice()
       // 将临时保存的订单产品列表放入 domains 里面
@@ -598,6 +683,41 @@ export default {
             this.$notify({
               title: '新增入库单',
               message: '新增成功！',
+              type: 'success',
+              duration: 2000
+            })
+            this.temp = []
+            this.dynamicValidateForm = {}
+            this.getData()
+            this.listLoading = false
+
+            // 关闭弹出框
+            this.dialogFormVisible = false
+          }).catch(() => {
+            this.listLoading = false
+          })
+        }
+      })
+    },
+
+    // 更新入库数据
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.listLoading = true
+          const deleteZeroProduct = []
+          this.savePurchaseProduct.forEach(element => {
+            if (element.quantity !== 0) {
+              deleteZeroProduct.push(element)
+            }
+          })
+          this.dynamicValidateForm.domains = deleteZeroProduct
+
+          // 发送到后台，添加该次出库单
+          updatePurchaseOrder(this.dynamicValidateForm).then((response) => {
+            this.$notify({
+              title: '更新入库单',
+              message: response.msg,
               type: 'success',
               duration: 2000
             })

@@ -146,7 +146,7 @@ export default {
         // legend: {
         //   itemWidth: 15,
         //   itemHeight: 15,
-        //   data: ['同事朋友', '安仁刘总']
+        //   data: ['同事朋友', '刘总']
         // },
         series: this.values,
         dataZoom: [ // 滑动条

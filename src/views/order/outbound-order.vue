@@ -2,7 +2,7 @@
  * @Author: xie.yx yxxie@gk-estor.com
  * @Date: 2022-12-05 21:09:43
  * @LastEditors: xie.yx yxxie@gk-estor.com
- * @LastEditTime: 2023-03-22 21:54:34
+ * @LastEditTime: 2023-06-28 11:54:34
  * @FilePath: /vue-element-admin/src/views/tab/order.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -22,19 +22,21 @@
             <!-- 本次出库的标题 -->
             <span style="font-size: 17px; font-weight: 800;"><i class="el-icon-document" />出库抬头：{{ domain.title }}</span>
             <el-button type="text" class="button" @click="handleDetails(domain.business_id, index)">查看详情<i class="el-icon-view el-icon--right" /></el-button>
+            <el-button type="text" class="button" style="margin-right: 15px;" @click="handleUpdate(domain, index)">编辑<i class="el-icon-edit el-icon--right" /></el-button>
 
             <el-divider />
-            <div class="bottom clearfix">本次出库时间：{{ domain.create_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="bottom clearfix">本次订单出库时间：{{ domain.create_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="bottom clearfix">本次订单更新时间：{{ domain.update_time | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}</div>
             <div class="bottom clearfix">归属经销商：<el-tag size="small">{{ domain.belong_to }}</el-tag></div>
             <div class="bottom clearfix">本次出库的产品种类：<el-tag size="small" type="success">{{ domain.type }}</el-tag></div>
             <div class="bottom clearfix">本次出库总数量（瓶）：{{ domain.total_piece }}</div>
             <div class="bottom clearfix">本次出库总金额（元）：{{ domain.total_price }}</div>
 
-            <el-tooltip :disabled="domain.remarks == null || domain.remarks.length <= 18" class="item" effect="dark" :content="domain.remarks" placement="top-start">
+            <el-tooltip :disabled="domain.remarks == null || domain.remarks.length <= 18" class="item" style="margin-top: 8px;" effect="dark" :content="domain.remarks" placement="top-start">
               <div ref="remarksRef" class="designer-inner-info_width">备注：{{ domain.remarks }}</div>
             </el-tooltip>
 
-            <el-button size="small" class="filter-item bottom clearfix" type="danger" icon="el-icon-delete" @click="handleDelete(domain, index)">删除</el-button>
+            <el-button size="small" class="filter-item bottom" type="danger" icon="el-icon-delete" @click="handleDelete(domain, index)">删除</el-button>
           </div>
         </el-card>
       </el-col>
@@ -134,6 +136,10 @@
       <el-form ref="dataForm" :rules="rules" :model="dynamicValidateForm" label-width="100px">
         <el-form-item label-width="120px" prop="title" label="出库单标题（抬头）：">
           <el-input v-model.trim="dynamicValidateForm.title" suffix-icon="el-icon-edit" placeholder="请输入出库单抬头" />
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus == 'update'" label-width="120px" prop="create_time" label="出库时间：">
+          <el-date-picker v-model.trim="dynamicValidateForm.create_time" type="datetime" value-format="timestamp" placeholder="选择日期时间" />
         </el-form-item>
 
         <el-form-item label-width="120px" prop="belong_to" label="属于哪里的经销商：">
@@ -336,7 +342,7 @@
 </template>
 
 <script>
-import { addOutboundOrder, getOutboundOrder, getOutboundProductDetails, delOutboundOrder } from '@/api/outbound_order'
+import { addOutboundOrder, updateOutboundOrder, getOutboundOrder, getOutboundProductDetails, delOutboundOrder } from '@/api/outbound_order'
 import { getDealerList, searchDealerProduct } from '@/api/dealer_product'
 import { parseTime } from '@/utils'
 import waves from '@/directive/waves' // waves directive
@@ -426,7 +432,7 @@ export default {
       dialogStatus: '',
       textMap: {
         detail: '本次出库详情信息',
-        update: '编辑产品',
+        update: '更新本次出库信息',
         create: '添加本次出库单产品'
       },
       // 表单验证规则
@@ -445,13 +451,13 @@ export default {
         address: [{ required: true, message: '请输入发货地址', trigger: 'change' }],
         phone: [{ required: false },
           { type: 'number',
-            message: '手机号格式不正确',
+            message: '手机号码格式不正确',
             trigger: 'change',
             transform(value) {
               var phonereg = 11 && /^((13|14|15|16|17|18|19)[0-9]{1}\d{8})$/
-              if (value !== undefined && !phonereg.test(value)) {
+              if (value !== undefined && value !== null && value !== ' ' && !phonereg.test(value)) {
                 return false
-              } else if (value === undefined) {
+              } else if (value === undefined || value === null || value === ' ') {
                 return value
               } else {
                 return Number(value)
@@ -584,14 +590,141 @@ export default {
       return newList
     },
 
+    // 添加出库单数据
+    addData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.listLoading = true
+          const deleteZeroProduct = []
+          this.saveOutboundProduct.forEach(element => {
+            if (element.quantity !== 0) {
+              deleteZeroProduct.push(element)
+            }
+          })
+          this.dynamicValidateForm.domains = deleteZeroProduct
+
+          // 发送到后台，添加该次出库单
+          addOutboundOrder(this.dynamicValidateForm).then((response) => {
+            this.$notify({
+              title: '新增出库单',
+              message: '新增成功！',
+              type: 'success',
+              duration: 2000
+            })
+            this.temp = []
+            this.dynamicValidateForm = {}
+            this.getData()
+            this.listLoading = false
+
+            // 关闭弹出框
+            this.dialogFormVisible = false
+          }).catch(() => {
+            this.listLoading = false
+          })
+        }
+      })
+    },
+
+    // 更新出库数据
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.listLoading = true
+          const deleteZeroProduct = []
+          this.saveOutboundProduct.forEach(element => {
+            if (element.quantity !== 0) {
+              deleteZeroProduct.push(element)
+            }
+          })
+          this.dynamicValidateForm.domains = deleteZeroProduct
+
+          // 发送到后台，添加该次出库单
+          updateOutboundOrder(this.dynamicValidateForm).then((response) => {
+            this.$notify({
+              title: '更新出库单',
+              message: response.msg,
+              type: 'success',
+              duration: 2000
+            })
+            this.temp = []
+            this.dynamicValidateForm = {}
+            this.getData()
+            this.listLoading = false
+
+            // 关闭弹出框
+            this.dialogFormVisible = false
+          }).catch(() => {
+            this.listLoading = false
+          })
+        }
+      })
+    },
+
+    // 添加产品到本次出库订单的产品列表
+    addProduct() {
+      this.dynamicValidateForm.domains = []
+      // 如果已存在一模一样的，就直接覆盖
+      this.productList.forEach(element => {
+        let is_same = false
+
+        this.saveOutboundProduct.forEach((element1, index) => {
+          if (element1.product_name === element.product_name && element1.scent_type === element.scent_type && element1.specifications === element.specifications) {
+            // 一样的就将数量进行覆盖
+            this.saveOutboundProduct[index].quantity = element.quantity
+            // 数量覆盖之后，行内价格也要进行覆盖
+            const subtotal_price = element.unit_price * element.quantity
+            this.saveOutboundProduct[index].subtotal_price = subtotal_price
+
+            is_same = true
+            return false // 跳出此次循环
+          }
+        })
+        if (is_same === false) {
+          this.saveOutboundProduct.push(element)
+        }
+      })
+
+      // 删除数量为0的产品列表
+      const remove_zero_outbound_product = this.saveOutboundProduct.filter(item => item.quantity !== 0 && item.quantity !== undefined)
+      this.saveOutboundProduct = remove_zero_outbound_product
+
+      // 调用计算 总计金额 和 总计数量 的函数
+      this.calPiecePrice()
+      // 将临时保存的订单产品列表放入 domains 里面
+      this.dynamicValidateForm.domains = this.saveOutboundProduct
+      this.innerVisible = false
+    },
+
     // 点击添加出库产品
     addOutboundProduct() {
       this.innerVisible = true
-
-      // 获取所有的产品
       this.embeddedListLoading = true
+
+      // 获取所有的经销商产品
       searchDealerProduct(this.productListQuery).then(response => {
-        this.productList = response.data.data
+        // 用临时变量暂时保存检索的产品
+        const temp_productList = response.data.data
+        // 将临时保存的产品的数量弄到搜索框里面去
+        this.saveOutboundProduct.forEach(element1 => {
+          temp_productList.forEach((element2, index) => {
+            if (element1.product_name === element2.product_name && element1.scent_type === element2.scent_type && element1.specifications === element2.specifications) {
+              temp_productList[index].quantity = element1.quantity
+              if (temp_productList[index].quantity !== undefined) {
+                let subtotal_price = 0
+                subtotal_price = temp_productList[index].unit_price * temp_productList[index].quantity
+                if (subtotal_price >= 0) {
+                  temp_productList[index].subtotal_price = parseFloat(subtotal_price).toFixed(2)
+                } else {
+                  temp_productList[index].subtotal_price = undefined
+                }
+              } else {
+                temp_productList[index].subtotal_price = undefined
+              }
+            }
+          })
+        })
+        // 覆盖临时变量
+        this.productList = temp_productList
         this.productTotal = response.data.count
         this.embeddedListLoading = false
       }).catch(() => {
@@ -644,31 +777,6 @@ export default {
       }
     },
 
-    // 添加产品到本次出库订单
-    addProduct() {
-      this.dynamicValidateForm.domains = []
-      // 如果已存在一模一样的，就直接覆盖
-      this.productList.forEach(element => {
-        let is_same = false
-        if (element.quantity !== 0 && element.quantity !== undefined) {
-          this.saveOutboundProduct.forEach(element1 => {
-            if (element1.product_name === element.product_name && element1.scent_type === element.scent_type) {
-              is_same = true
-              return false
-            }
-          })
-          if (is_same === false) {
-            this.saveOutboundProduct.push(element)
-          }
-        }
-      })
-      // 调用计算 总计金额 和 总计数量 的函数
-      this.calPiecePrice()
-      // 将临时保存的订单产品列表放入 domains 里面
-      this.dynamicValidateForm.domains = this.saveOutboundProduct
-      this.innerVisible = false
-    },
-
     // 搜索功能
     handleFilter() {
       // 获取所有的产品
@@ -717,7 +825,6 @@ export default {
     calProductPrice(row, index) {
       if (row.quantity !== undefined) {
         let subtotal_price = 0
-        // subtotal_price = row.specification_of_piece * row.unit_price * row.quantity
         subtotal_price = row.unit_price * row.quantity
         if (subtotal_price >= 0) {
           // 页面更新数据，得先删除这个属性，再进行赋值
@@ -744,6 +851,65 @@ export default {
       // 页面更新数据，得先删除这个属性，再进行赋值
       this.$delete(this.dynamicValidateForm, 'title')
       this.$set(this.dynamicValidateForm, 'title', this.getTime() + '日出库')
+      // 删除搜索的经销商名
+      this.$delete(this.productListQuery, 'dealer_name')
+    },
+
+    // 更新出库单卡片数据
+    handleUpdate(domain, index) {
+      this.detailsListLoading = true
+      // this.temp = Object.assign({}, domain) // copy obj
+      const params = {
+        'outbound_order_id': domain.business_id
+      }
+      getOutboundProductDetails(params).then((response) => {
+        this.saveOutboundProduct = response.data.data
+        // 更新价格
+        this.calPiecePrice()
+        this.detailsListLoading = false
+      }).catch(() => {
+        this.detailsListLoading = false
+      })
+
+      // 标题
+      // 页面更新数据，得先删除这个属性，再进行赋值
+      this.$delete(this.dynamicValidateForm, 'title')
+      this.$set(this.dynamicValidateForm, 'title', this.temp[index].title)
+      // 属于哪个经销商
+      this.$delete(this.dynamicValidateForm, 'belong_to')
+      this.$set(this.dynamicValidateForm, 'belong_to', this.temp[index].belong_to)
+      // 将内嵌的搜索框也要加进去
+      this.$delete(this.productListQuery, 'dealer_name')
+      this.$set(this.productListQuery, 'dealer_name', this.temp[index].belong_to)
+
+      // 手机
+      this.$delete(this.dynamicValidateForm, 'phone')
+      this.$set(this.dynamicValidateForm, 'phone', this.temp[index].phone)
+      // 地址
+      this.$delete(this.dynamicValidateForm, 'address')
+      this.$set(this.dynamicValidateForm, 'address', this.temp[index].address)
+      // 物流公司
+      this.$delete(this.dynamicValidateForm, 'logistics_company')
+      this.$set(this.dynamicValidateForm, 'logistics_company', this.temp[index].logistics_company)
+      // 物流信息
+      this.$delete(this.dynamicValidateForm, 'logistics_num')
+      this.$set(this.dynamicValidateForm, 'logistics_num', this.temp[index].logistics_num)
+      // 备注
+      this.$delete(this.dynamicValidateForm, 'remarks')
+      this.$set(this.dynamicValidateForm, 'remarks', this.temp[index].remarks)
+      // 订单id
+      this.$delete(this.dynamicValidateForm, 'business_id')
+      this.$set(this.dynamicValidateForm, 'business_id', this.temp[index].business_id)
+
+      // 订单的创建时间
+      this.$delete(this.dynamicValidateForm, 'create_time')
+      this.$set(this.dynamicValidateForm, 'create_time', parseInt(this.temp[index].create_time) * 1000)
+
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
     },
 
     // 点击查看详情
@@ -822,41 +988,6 @@ export default {
       })
     },
 
-    // 添加出库单数据
-    addData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.listLoading = true
-          const deleteZeroProduct = []
-          this.saveOutboundProduct.forEach(element => {
-            if (element.quantity !== 0) {
-              deleteZeroProduct.push(element)
-            }
-          })
-          this.dynamicValidateForm.domains = deleteZeroProduct
-
-          // 发送到后台，添加该次出库单
-          addOutboundOrder(this.dynamicValidateForm).then((response) => {
-            this.$notify({
-              title: '新增出库单',
-              message: '新增成功！',
-              type: 'success',
-              duration: 2000
-            })
-            this.temp = []
-            this.dynamicValidateForm = {}
-            this.getData()
-            this.listLoading = false
-
-            // 关闭弹出框
-            this.dialogFormVisible = false
-          }).catch(() => {
-            this.listLoading = false
-          })
-        }
-      })
-    },
-
     // 获取出库单数据
     getData() {
       this.cardListLoading = true
@@ -910,7 +1041,7 @@ export default {
 
   .bottom {
     margin-top: 8px;
-    /* line-height: 12px; */
+    line-height: 12px;
   }
 
   .button {

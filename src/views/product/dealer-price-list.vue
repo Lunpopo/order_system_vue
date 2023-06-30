@@ -389,7 +389,6 @@ export default {
         this.dealerListOptions = response.data.data
         this.listLoading = false
 
-        // 手动设 长沙周艳艳 为默认
         const dealer_name = sessionStorage.getItem('selectDealer')
         // 如果为空，就选择一个默认值
         if (dealer_name === null) {

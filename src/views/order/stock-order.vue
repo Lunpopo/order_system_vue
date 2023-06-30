@@ -11,9 +11,9 @@
       </el-button>
     </div>
 
-    <el-tabs v-model.trim="activeName" type="border-card">
+    <el-tabs v-model.trim="activeName" type="card">
       <!-- 产品总库存数量表格 -->
-      <el-tab-pane>
+      <el-tab-pane class="cs02">
         <span slot="label"><i class="el-icon-date" /> 产品总库存数量表</span>
         <!-- 表格数据 -->
         <el-table
@@ -82,7 +82,7 @@
       </el-tab-pane>
 
       <!-- 产品入库数量表格 -->
-      <el-tab-pane>
+      <el-tab-pane class="cs02">
         <span slot="label"><i class="el-icon-date" /> 产品入库数量表</span>
         <!-- 表格数据 -->
         <el-table
@@ -145,7 +145,7 @@
       </el-tab-pane>
 
       <!-- 产品出库数量表格 -->
-      <el-tab-pane>
+      <el-tab-pane class="cs02">
         <span slot="label"><i class="el-icon-date" /> 产品出库数量表</span>
         <!-- 表格数据 -->
         <el-table
@@ -206,6 +206,7 @@
 
 <script>
 import { getStockDataList, getPurchaseStockDataList, getOutboundStockDataList, getStockAllData, getPurchaseStockAllData, getOutboundStockAllData } from '@/api/stock_order'
+import 'animate.css'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -476,5 +477,17 @@ export default {
     .el-form-item__content {
       margin: 0 !important;
     }
+  }
+
+  /**添加切换动画 */
+  .cs02 {
+    animation: fadeIn 1.2s 0.02s ease backwards;
+    /*解释：
+    * fadeInleft 是引用插件中的一个动画名称
+    * 1s         是点击时，这个动画整体使用的时间
+    * 0.02s      是动画刚开始显示需要的时间
+    * ease       是动画开始的方向
+    * backwards  有啥效果，鄙人目前还没看出来，百度查的说是“规定对象动画时间之外的状态”
+    */
   }
 </style>
